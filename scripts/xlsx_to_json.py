@@ -25,16 +25,28 @@ from pathlib import Path
 openpyxl = None
 
 # ── mapeamento de colunas  (índice 0-based) ───────────────────────────────────
-# Altere aqui se a sua planilha tiver colunas em ordem diferente
-COL_PRIORIDADE = 0   # A – Prioridade
-COL_PRAZO1     = 1   # B – Prazo (campo extra, geralmente "em aberto")
-COL_EIXO       = 2   # C – Eixo Temático
-COL_PROCESSO   = 3   # D – Processo
-COL_ATIVIDADE  = 4   # E – Atividade
-COL_TAREFA     = 5   # F – Tarefa
-COL_RESP       = 6   # G – Responsável
-COL_PRAZO      = 7   # H – Prazo (data real)
-COL_STATUS     = 8   # I – Status
+# Detecta automaticamente 8 colunas (sem Prazo duplicado) ou 9 colunas
+# Layout 8 colunas: Prioridade | Prazo | Eixo | Processo | Atividade | Tarefa | Responsável | Status
+# Layout 9 colunas: Prioridade | Prazo(ignorar) | Eixo | Processo | Atividade | Tarefa | Responsável | Prazo | Status
+def detect_columns(header_row):
+    ncols = len(header_row)
+    if ncols <= 8:
+        return {"prioridade": 0, "prazo1": 1, "eixo": 2, "processo": 3,
+                "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 1, "status": 7}
+    else:
+        return {"prioridade": 0, "prazo1": 1, "eixo": 2, "processo": 3,
+                "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 7, "status": 8}
+
+# defaults (overridden by detect_columns)
+COL_PRIORIDADE = 0
+COL_PRAZO1     = 1
+COL_EIXO       = 2
+COL_PROCESSO   = 3
+COL_ATIVIDADE  = 4
+COL_TAREFA     = 5
+COL_RESP       = 6
+COL_PRAZO      = 7
+COL_STATUS     = 8
 
 # ── normalização ──────────────────────────────────────────────────────────────
 STATUS_MAP = {
@@ -42,12 +54,16 @@ STATUS_MAP = {
     "andamento":    "em_andamento",
     "não iniciado": "nao_iniciado",
     "nao iniciado": "nao_iniciado",
+    "não iniciada": "nao_iniciado",
+    "nao iniciada": "nao_iniciado",
     "em aberto":    "nao_iniciado",
     "aberto":       "nao_iniciado",
     "concluído":    "concluido",
     "concluido":    "concluido",
     "cumprido":     "concluido",
     "bloqueado":    "bloqueado",
+    "stand by":     "bloqueado",
+    "standby":      "bloqueado",
     "em risco":     "em_risco",
     "risco":        "em_risco",
     "":             "nao_iniciado",
@@ -114,7 +130,9 @@ def rows_from_xlsx(path: Path):
     for i, row in enumerate(raw[:6]):
         if any("eixo" in str(c or "").lower() or "linha" in str(c or "").lower() for c in row):
             hdr = i; break
-    return [list(r) for r in raw[hdr+1:]]
+    header = list(raw[hdr]) if raw else []
+    data = [list(r) for r in raw[hdr+1:]]
+    return header, data
 
 def rows_from_csv(path: Path):
     for enc in ("utf-8-sig", "latin-1", "cp1252", "utf-8"):
@@ -122,8 +140,9 @@ def rows_from_csv(path: Path):
             text = path.read_text(encoding=enc)
             reader = csv.reader(StringIO(text), delimiter=";")
             all_rows = list(reader)
-            # pula cabeçalho (primeira linha)
-            return [r for r in all_rows[1:]]
+            header = all_rows[0] if all_rows else []
+            data = [r for r in all_rows[1:]]
+            return header, data
         except UnicodeDecodeError:
             continue
     sys.exit("Não foi possível decodificar o arquivo CSV.")
@@ -136,6 +155,22 @@ def read_file(path: Path):
         return rows_from_csv(path)
     else:
         sys.exit(f"Formato não suportado: {suf}. Use .xlsx ou .csv")
+
+def setup_columns(header):
+    global COL_PRIORIDADE, COL_PRAZO1, COL_EIXO, COL_PROCESSO
+    global COL_ATIVIDADE, COL_TAREFA, COL_RESP, COL_PRAZO, COL_STATUS
+    cols = detect_columns(header)
+    COL_PRIORIDADE = cols["prioridade"]
+    COL_PRAZO1     = cols["prazo1"]
+    COL_EIXO       = cols["eixo"]
+    COL_PROCESSO   = cols["processo"]
+    COL_ATIVIDADE  = cols["atividade"]
+    COL_TAREFA     = cols["tarefa"]
+    COL_RESP       = cols["resp"]
+    COL_PRAZO      = cols["prazo"]
+    COL_STATUS     = cols["status"]
+    ncols = len(header)
+    print(f"  Layout detectado: {ncols} colunas → Status na col {COL_STATUS}")
 
 # ── parse + agrupamento ───────────────────────────────────────────────────────
 def parse_rows(raw_rows) -> list:
@@ -271,7 +306,8 @@ def main():
         sys.exit("Forneça --file ou --sharepoint-url")
 
     print(f"Lendo {path} …")
-    raw_rows = read_file(path)
+    header, raw_rows = read_file(path)
+    setup_columns(header)
     records  = parse_rows(raw_rows)
     linhas   = build_json(records)
 
