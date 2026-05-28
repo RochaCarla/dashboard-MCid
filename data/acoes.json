@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "titulo": "Painel de Gestão — GT Industrialização",
+    "subtitulo": "Ministério das Cidades · Secretaria Nacional de Habitação",
+    "atualizado_em": "2026-05-28",
+    "schema": "v2"
+  },
+  "linhas": [
+    {
+      "id": 1,
+      "nome": "Financiamento",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Prospectar demandas de investimento da cadeia produtiva",
+          "tarefas": [
+            {
+              "id": 1001,
+              "atividade": "Tratamento dos dados do questionário sobre a demanda por Capital de Giro",
+              "desc": "Análise dos dados",
+              "resp": "CEAG UnB",
+              "status": "em_andamento",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1002,
+              "atividade": "Tratamento dos dados do questionário sobre a demanda por Capital de Giro",
+              "desc": "Repassar ao BNDES as informações compiladas",
+              "resp": "CEAG UnB",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1003,
+              "atividade": "Mapear parceiros para financiamento",
+              "desc": "Mapear alternativos de parceiros de financiamento (bancos)",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1004,
+              "atividade": "Mobilizar parceiros para linhas de financiamento fabril",
+              "desc": "Estruturas linhas de financiamento de Capital de Giro para a construção (bancos e agências de fomento)",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

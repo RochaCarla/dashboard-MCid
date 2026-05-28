@@ -1,0 +1,78 @@
+name: Sync Ações.xlsx → acoes.json
+
+on:
+  # Executa automaticamente quando o .xlsx for enviado ao repositório
+  push:
+    paths:
+      - "Ações.xlsx"
+      - "Acoes.xlsx"
+  # Agenda diária às 7h (horário de Brasília = 10h UTC)
+  schedule:
+    - cron: "0 10 * * *"
+  # Permite disparo manual pelo GitHub Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: write   # para fazer commit do JSON atualizado
+
+jobs:
+  convert:
+    name: Converter planilha → JSON
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o repositório
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configura Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Instala dependências
+      - name: Install dependencies
+        run: pip install openpyxl requests
+
+      # 4a. Se o arquivo .xlsx estiver no repositório (modo local)
+      - name: Converter xlsx local (se existir)
+        if: hashFiles('Ações.xlsx') != ''
+        run: |
+          python scripts/xlsx_to_json.py --file "Ações.xlsx" --out data/acoes.json
+
+      # 4b. Ou baixa do SharePoint via API (modo automático)
+      #     Descomente este bloco e configure os Secrets no GitHub:
+      #     Settings → Secrets → Actions → New repository secret
+      #     - SHAREPOINT_FILE_URL : URL de compartilhamento do arquivo
+      #     - AZURE_TENANT_ID     : ID do tenant Azure AD
+      #     - AZURE_CLIENT_ID     : ID do App Registration
+      #     - AZURE_CLIENT_SECRET : Secret do App Registration
+      #
+      # - name: Download do SharePoint e converter
+      #   if: hashFiles('Ações.xlsx') == ''
+      #   env:
+      #     SHAREPOINT_FILE_URL: ${{ secrets.SHAREPOINT_FILE_URL }}
+      #     AZURE_TENANT_ID:     ${{ secrets.AZURE_TENANT_ID }}
+      #     AZURE_CLIENT_ID:     ${{ secrets.AZURE_CLIENT_ID }}
+      #     AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      #   run: |
+      #     python scripts/xlsx_to_json.py \
+      #       --sharepoint-url "$SHAREPOINT_FILE_URL" \
+      #       --tenant         "$AZURE_TENANT_ID" \
+      #       --client-id      "$AZURE_CLIENT_ID" \
+      #       --client-secret  "$AZURE_CLIENT_SECRET" \
+      #       --out data/acoes.json
+
+      # 5. Faz commit do JSON atualizado
+      - name: Commit acoes.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/acoes.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração no JSON — nada a commitar."
+          else
+            git commit -m "chore: atualiza acoes.json [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git push
+          fi

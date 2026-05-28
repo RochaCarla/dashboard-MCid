@@ -1,0 +1,287 @@
+"""
+xlsx_to_json.py  —  v2
+Converte Ações.xlsx (estrutura: Eixo Temático → Processo → Atividade → Tarefa)
+para data/acoes.json usado pelo dashboard GitHub Pages.
+
+Uso local:
+    python scripts/xlsx_to_json.py --file "Ações.xlsx"
+    python scripts/xlsx_to_json.py --file "planilha.csv"   # CSV Latin-1 também funciona
+
+Uso no GitHub Actions (SharePoint):
+    python scripts/xlsx_to_json.py \
+        --sharepoint-url "$SHAREPOINT_FILE_URL" \
+        --tenant "$TENANT_ID" \
+        --client-id "$CLIENT_ID" \
+        --client-secret "$CLIENT_SECRET"
+"""
+
+import argparse, csv, json, re, sys
+from collections import OrderedDict
+from datetime import datetime
+from io import StringIO
+from pathlib import Path
+
+# ── dependências ──────────────────────────────────────────────────────────────
+try:
+    import openpyxl
+except ImportError:
+    sys.exit("Instale openpyxl:  pip install openpyxl")
+
+# ── mapeamento de colunas  (índice 0-based) ───────────────────────────────────
+# Altere aqui se a sua planilha tiver colunas em ordem diferente
+COL_PRIORIDADE = 0   # A – Prioridade
+COL_PRAZO1     = 1   # B – Prazo (campo extra, geralmente "em aberto")
+COL_EIXO       = 2   # C – Eixo Temático
+COL_PROCESSO   = 3   # D – Processo
+COL_ATIVIDADE  = 4   # E – Atividade
+COL_TAREFA     = 5   # F – Tarefa
+COL_RESP       = 6   # G – Responsável
+COL_PRAZO      = 7   # H – Prazo (data real)
+COL_STATUS     = 8   # I – Status
+
+# ── normalização ──────────────────────────────────────────────────────────────
+STATUS_MAP = {
+    "em andamento": "em_andamento",
+    "andamento":    "em_andamento",
+    "não iniciado": "nao_iniciado",
+    "nao iniciado": "nao_iniciado",
+    "em aberto":    "nao_iniciado",
+    "aberto":       "nao_iniciado",
+    "concluído":    "concluido",
+    "concluido":    "concluido",
+    "cumprido":     "concluido",
+    "bloqueado":    "bloqueado",
+    "em risco":     "em_risco",
+    "risco":        "em_risco",
+    "":             "nao_iniciado",
+}
+PRIO_MAP = {
+    "alta":  "alta",
+    "média": "media",
+    "media": "media",
+    "médio": "media",
+    "medio": "media",
+    "baixa": "baixa",
+    "":      "media",
+}
+
+def norm(v) -> str:
+    return re.sub(r"\s+", " ", str(v or "").strip())
+
+def parse_status(raw: str) -> str:
+    k = norm(raw).lower()
+    for kk, vv in STATUS_MAP.items():
+        if kk and kk in k:
+            return vv
+    return "nao_iniciado"
+
+def parse_prio(raw: str) -> str:
+    return PRIO_MAP.get(norm(raw).lower(), "media")
+
+def parse_prazo(raw) -> str:
+    if raw is None: return ""
+    if isinstance(raw, datetime): return raw.strftime("%Y-%m-%d")
+    s = norm(str(raw))
+    if s.lower() in ("em aberto", "aberto", ""): return ""
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+        try: return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
+        except ValueError: pass
+    return s
+
+def eixo_id(text: str):
+    m = re.match(r"^(\d+)\.", text.strip())
+    return int(m.group(1)) if m else None
+
+def eixo_nome(text: str) -> str:
+    return re.sub(r"^\d+\.\s*", "", text.strip())
+
+def is_admin_row(text: str) -> bool:
+    skip = ["encaminhamentos", "agendar", "produzir documento", "trazer a frente",
+            "sem equivalência", "sem equivalencia"]
+    return any(s in text.lower() for s in skip)
+
+# ── leitura de linhas brutas ──────────────────────────────────────────────────
+def rows_from_xlsx(path: Path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    ws = wb.active
+    raw = list(ws.iter_rows(values_only=True))
+    # detecta cabeçalho
+    hdr = 0
+    for i, row in enumerate(raw[:6]):
+        if any("eixo" in str(c or "").lower() or "linha" in str(c or "").lower() for c in row):
+            hdr = i; break
+    return [list(r) for r in raw[hdr+1:]]
+
+def rows_from_csv(path: Path):
+    for enc in ("utf-8-sig", "latin-1", "cp1252", "utf-8"):
+        try:
+            text = path.read_text(encoding=enc)
+            reader = csv.reader(StringIO(text), delimiter=";")
+            all_rows = list(reader)
+            # pula cabeçalho (primeira linha)
+            return [r for r in all_rows[1:]]
+        except UnicodeDecodeError:
+            continue
+    sys.exit("Não foi possível decodificar o arquivo CSV.")
+
+def read_file(path: Path):
+    suf = path.suffix.lower()
+    if suf in (".xlsx", ".xls"):
+        return rows_from_xlsx(path)
+    elif suf == ".csv":
+        return rows_from_csv(path)
+    else:
+        sys.exit(f"Formato não suportado: {suf}. Use .xlsx ou .csv")
+
+# ── parse + agrupamento ───────────────────────────────────────────────────────
+def parse_rows(raw_rows) -> list:
+    def cell(row, idx, default=""):
+        try: return norm(row[idx]) if row[idx] is not None else default
+        except IndexError: return default
+
+    # propaga contexto (células mescladas ficam vazias nas linhas seguintes)
+    prev = {}
+    records = []
+    for row in raw_rows:
+        r = {
+            "prioridade": cell(row, COL_PRIORIDADE),
+            "eixo":       cell(row, COL_EIXO),
+            "processo":   cell(row, COL_PROCESSO),
+            "atividade":  cell(row, COL_ATIVIDADE),
+            "tarefa":     cell(row, COL_TAREFA),
+            "resp":       cell(row, COL_RESP),
+            "prazo":      cell(row, COL_PRAZO),
+            "status":     cell(row, COL_STATUS),
+        }
+        # herda campos não preenchidos da linha anterior
+        for k in ("eixo", "processo", "atividade", "prioridade", "resp"):
+            if not r[k]:
+                r[k] = prev.get(k, "")
+        prev = {k: r[k] for k in r}
+
+        # filtra linhas sem tarefa nem atividade útil
+        if not r["tarefa"] and not r["atividade"]:
+            continue
+        if r["eixo"] and is_admin_row(r["eixo"]):
+            continue
+
+        records.append(r)
+    return records
+
+def build_json(records: list) -> dict:
+    eixos: dict[int, dict] = OrderedDict()
+    counter = 0
+
+    for r in records:
+        eid = eixo_id(r["eixo"]) if r["eixo"] else None
+        if not eid:
+            continue
+
+        if eid not in eixos:
+            eixos[eid] = {
+                "id":      eid,
+                "nome":    eixo_nome(r["eixo"]),
+                "objetivo": "",
+                "atores":   "",
+                "meta":     "",
+                "processos": OrderedDict(),
+            }
+
+        proc_key = r["processo"] or r["atividade"] or "Geral"
+        if proc_key not in eixos[eid]["processos"]:
+            eixos[eid]["processos"][proc_key] = []
+
+        desc = r["tarefa"] or r["atividade"]
+        counter += 1
+        eixos[eid]["processos"][proc_key].append({
+            "id":         int(f"{eid}{counter:03d}"),
+            "atividade":  r["atividade"],
+            "desc":       desc,
+            "resp":       r["resp"],
+            "status":     parse_status(r["status"]),
+            "prioridade": parse_prio(r["prioridade"]),
+            "progresso":  100 if parse_status(r["status"]) == "concluido" else 0,
+            "prazo":      parse_prazo(r["prazo"]),
+            "notas":      "",
+        })
+
+    # serializa
+    linhas_out = []
+    for eid, e in eixos.items():
+        processos_out = [
+            {"processo": pnome, "tarefas": tarefas}
+            for pnome, tarefas in e["processos"].items()
+        ]
+        linhas_out.append({
+            "id":       e["id"],
+            "nome":     e["nome"],
+            "objetivo": e["objetivo"],
+            "atores":   e["atores"],
+            "meta":     e["meta"],
+            "processos": processos_out,
+        })
+    return linhas_out
+
+# ── download SharePoint ───────────────────────────────────────────────────────
+def download_sharepoint(url, tenant, client_id, secret, dest: Path):
+    try: import requests
+    except ImportError: sys.exit("pip install requests")
+    tok = requests.post(
+        f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+        data={"grant_type":"client_credentials","client_id":client_id,
+              "client_secret":secret,"scope":"https://graph.microsoft.com/.default"},
+        timeout=30).json()["access_token"]
+    enc = "u!" + url.replace("https://","").replace("/","_").replace(".","_")
+    r = requests.get(f"https://graph.microsoft.com/v1.0/shares/{enc}/root/content",
+                     headers={"Authorization":f"Bearer {tok}"}, timeout=60)
+    r.raise_for_status()
+    dest.write_bytes(r.content)
+    print(f"✓ Baixado → {dest}")
+    return dest
+
+# ── main ──────────────────────────────────────────────────────────────────────
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--file")
+    p.add_argument("--sharepoint-url")
+    p.add_argument("--tenant")
+    p.add_argument("--client-id")
+    p.add_argument("--client-secret")
+    p.add_argument("--out", default="data/acoes.json")
+    p.add_argument("--titulo",    default="Painel de Gestão — GT Industrialização")
+    p.add_argument("--subtitulo", default="Ministério das Cidades · Secretaria Nacional de Habitação")
+    args = p.parse_args()
+
+    if args.file:
+        path = Path(args.file)
+        if not path.exists(): sys.exit(f"Arquivo não encontrado: {path}")
+    elif args.sharepoint_url:
+        path = Path("/tmp/acoes_dl.xlsx")
+        download_sharepoint(args.sharepoint_url, args.tenant,
+                            args.client_id, args.client_secret, path)
+    else:
+        sys.exit("Forneça --file ou --sharepoint-url")
+
+    print(f"Lendo {path} …")
+    raw_rows = read_file(path)
+    records  = parse_rows(raw_rows)
+    linhas   = build_json(records)
+
+    total_tarefas = sum(len(p2["tarefas"]) for l in linhas for p2 in l["processos"])
+    data = {
+        "meta": {
+            "titulo":       args.titulo,
+            "subtitulo":    args.subtitulo,
+            "atualizado_em": datetime.utcnow().strftime("%Y-%m-%d"),
+            "schema":       "v2",
+        },
+        "linhas": linhas,
+    }
+
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"✓ {out}  →  {len(linhas)} eixos, {total_tarefas} tarefas")
+
+if __name__ == "__main__":
+    main()
