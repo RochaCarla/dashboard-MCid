@@ -1,7 +1,7 @@
 {
   "meta": {
     "titulo": "Painel de Gestão — GT Industrialização",
-    "subtitulo": "Ministério das Cidades · Secretaria Nacional de Habitação",
+    "subtitulo": "Universidade de Brasília · Ministério das Cidades",
     "atualizado_em": "2026-05-28",
     "schema": "v2"
   },
@@ -23,7 +23,7 @@
               "resp": "CEAG UnB",
               "status": "em_andamento",
               "prioridade": "media",
-              "progresso": 0,
+              "progresso": 50,
               "prazo": "",
               "notas": ""
             },

@@ -3,37 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Gestão — GT Industrialização</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<title>Painel de Gestão — GT Cidades Inteligentes</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A34F3'/><text x='16' y='22' font-family='sans-serif' font-size='9' font-weight='bold' fill='white' text-anchor='middle'>GH</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/dist/plot.umd.min.js"></script>
+<script src="scripts/vizEngine.js"></script>
 <style>
 :root {
-  --navy: #1B2A4A; --navy-l: #2A3D66;
-  --teal: #0D7377; --teal-l: #0F9B9F; --teal-bg: #E8F6F6;
-  --gold: #D4A843; --gold-d: #B8922E;
-  --bg: #F4F6F9; --card: #FFFFFF; --border: #E2E6ED;
-  --text: #2C3E50; --text-l: #7A8BA0; --text-m: #A0AEC0;
-  --ok:  #2ECC71; --ok-bg:  #E8FAF0;
-  --warn:#F39C12; --warn-bg:#FFF8E7;
-  --err: #E74C3C; --err-bg: #FDE8E8;
-  --info:#3498DB; --info-bg:#E8F4FD;
-  --sh-sm:0 1px 3px rgba(27,42,74,.06);
-  --sh-md:0 4px 12px rgba(27,42,74,.08);
-  --sh-lg:0 8px 30px rgba(27,42,74,.12);
+  --primary: #7A34F3; --primary-l: #8b5cf6; --primary-d: #5B21B6;
+  --navy: #7A34F3; --navy-l: #8b5cf6;
+  --teal: #10B981; --teal-l: #34D399; --teal-bg: #ECFDF5;
+  --gold: #F59E0B; --gold-d: #D97706;
+  --bg: #F8F9FC; --card: #FFFFFF; --border: #E5E7EB;
+  --text: #1F2937; --text-l: #6B7280; --text-m: #9CA3AF;
+  --ok:  #10B981; --ok-bg:  #ECFDF5;
+  --warn:#F59E0B; --warn-bg:#FFFBEB;
+  --err: #EF4444; --err-bg: #FEF2F2;
+  --info:#7A34F3; --info-bg:#F3EFFE;
+  --sh-sm:0 1px 3px rgba(122,52,243,.06);
+  --sh-md:0 4px 12px rgba(122,52,243,.1);
+  --sh-lg:0 8px 30px rgba(122,52,243,.12);
   --r:12px; --rs:8px;
   --tr:.25s cubic-bezier(.4,0,.2,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
 
-/* ── HEADER ── */
-.hdr{background:linear-gradient(135deg,var(--navy),var(--navy-l) 60%,var(--teal));
-  padding:24px 40px;position:sticky;top:0;z-index:100;
-  box-shadow:0 4px 20px rgba(27,42,74,.25)}
-.hdr-inner{max-width:1440px;margin:0 auto;display:flex;align-items:center;
-  justify-content:space-between;flex-wrap:wrap;gap:14px}
-.hdr h1{font-family:'Playfair Display',serif;font-size:20px;color:#fff;font-weight:700}
-.hdr .sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+/* ── HEADER INSTITUCIONAL ── */
+.hdr-inst{position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(122,52,243,.15)}
+.hdr-top{background:#fff;border-bottom:1px solid var(--border);padding:10px 40px}
+.hdr-top-inner{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logos-left{display:flex;align-items:center;gap:14px}
+.logo-item{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--navy)}
+.logo-mark{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.logo-mark.unb{background:#7A34F3}
+.logo-mark.mcid{background:#1351B4}
+.logo-mark.lablivre{background:#10B981}
+.logo-mark.ceag{background:#5B21B6}
+.logo-text{font-size:10px;font-weight:600;color:var(--text-l);line-height:1.2;max-width:90px}
+.logo-sep{width:1px;height:28px;background:var(--border);margin:0 4px}
+.hdr-title-bar{background:linear-gradient(135deg,#7A34F3 0%,#8b5cf6 100%);padding:16px 40px}
+.hdr-title-inner{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.hdr-title-inner h1{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:18px;color:#fff;font-weight:700}
+.hdr-title-inner .sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:2px}
 .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 13px;
   font-size:12px;color:rgba(255,255,255,.85)}
@@ -61,7 +75,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .kpi.c-err::before{background:var(--err)}
 .kpi:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
 .kpi-lbl{font-size:11px;color:var(--text-l);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.kpi-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--navy);line-height:1}
+.kpi-val{font-family:'Inter',sans-serif;font-size:28px;font-weight:700;color:var(--primary);line-height:1}
 .kpi-det{font-size:11px;color:var(--text-m);margin-top:5px}
 
 /* ── CHARTS ROW ── */
@@ -81,15 +95,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .filt{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);
   font-size:12px;font-weight:500;color:var(--text-l);cursor:pointer;transition:var(--tr);font-family:inherit}
-.filt:hover{border-color:var(--teal);color:var(--teal)}
-.filt.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.filt:hover{border-color:var(--primary);color:var(--primary)}
+.filt.active{background:var(--primary);border-color:var(--primary);color:#fff}
 .filt .cnt{display:inline-flex;align-items:center;justify-content:center;min-width:18px;
   height:18px;border-radius:9px;background:rgba(255,255,255,.3);font-size:10px;
   font-weight:700;margin-left:4px;padding:0 4px}
 .search-box{margin-left:auto;position:relative}
 .search-box input{padding:7px 13px 7px 32px;border:1px solid var(--border);border-radius:20px;
   font-size:12px;font-family:inherit;width:220px;background:var(--card);color:var(--text);transition:var(--tr)}
-.search-box input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,115,119,.1)}
+.search-box input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(122,52,243,.1)}
 .search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-m)}
 
 /* ── LINHA CARDS ── */
@@ -99,10 +113,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .linha-card.open{box-shadow:var(--sh-lg)}
 .linha-hdr{display:flex;align-items:center;padding:16px 20px;cursor:pointer;gap:14px;
   user-select:none;transition:var(--tr)}
-.linha-hdr:hover{background:rgba(13,115,119,.02)}
-.lnum{width:36px;height:36px;border-radius:9px;background:var(--navy);color:var(--gold);
+.linha-hdr:hover{background:rgba(122,52,243,.02)}
+.lnum{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#7A34F3,#8b5cf6);color:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Playfair Display',serif;font-size:15px;font-weight:700;flex-shrink:0}
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:700;flex-shrink:0}
 .linfo{flex:1;min-width:0}
 .lname{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .lobj{font-size:12px;color:var(--text-l);line-height:1.4}
@@ -133,7 +147,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .tbl thead th{font-size:10px;font-weight:700;color:var(--text-m);text-transform:uppercase;
   letter-spacing:.4px;padding:7px 9px;text-align:left;border-bottom:2px solid var(--border)}
 .tbl tbody tr{transition:var(--tr)}
-.tbl tbody tr:hover{background:rgba(13,115,119,.02)}
+.tbl tbody tr:hover{background:rgba(122,52,243,.02)}
 .tbl td{padding:9px 9px;font-size:12px;border-bottom:1px solid #F0F2F5;vertical-align:middle}
 
 /* status badge */
@@ -160,21 +174,57 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .empty{text-align:center;padding:24px;color:var(--text-m);font-size:12px}
 
 /* loading */
-#loading{position:fixed;inset:0;background:rgba(27,42,74,.7);display:flex;
+#loading{position:fixed;inset:0;background:rgba(122,52,243,.7);display:flex;
   flex-direction:column;align-items:center;justify-content:center;z-index:9999;
   color:#fff;font-size:15px;gap:14px;backdrop-filter:blur(4px)}
 .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.3);
   border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ── VIZ ENGINE ── */
+.viz-section{margin-top:24px;margin-bottom:24px}
+.viz-section h2{font-size:14px;font-weight:700;color:var(--primary);text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.viz-card{background:var(--card);border-radius:var(--r);padding:20px 22px;
+  box-shadow:var(--sh-sm);border:1px solid var(--border);margin-bottom:16px}
+.viz-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px;
+  text-transform:uppercase;letter-spacing:.4px}
+.viz-kpi{background:var(--card);border-radius:var(--rs);padding:14px 16px;
+  border:1px solid var(--border)}
+.viz-kpi-lbl{font-size:10px;color:var(--text-l);font-weight:600;text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:4px}
+.viz-kpi-val{font-size:24px;font-weight:700;color:var(--primary);line-height:1}
+.viz-kpi-det{font-size:10px;color:var(--text-m);margin-top:4px}
+
+/* ── FOOTER INSTITUCIONAL ── */
+.footer-inst{background:#7A34F3;color:rgba(255,255,255,.85);padding:40px 40px 0;margin-top:60px}
+.footer-inner{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;
+  padding-bottom:30px;border-bottom:1px solid rgba(255,255,255,.1)}
+.footer-brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px;margin-bottom:12px}
+.footer-brand .logo-mark{width:28px;height:28px;font-size:10px}
+.footer-desc{font-size:12px;color:rgba(255,255,255,.6);line-height:1.6}
+.footer-col h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:12px}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:8px}
+.footer-col ul li a{color:rgba(255,255,255,.7);text-decoration:none;font-size:12px;transition:color .2s}
+.footer-col ul li a:hover{color:#fff}
+.footer-col p{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.footer-bottom{padding:16px 0;text-align:center;font-size:11px;color:rgba(255,255,255,.4)}
+
 /* responsive */
 @media(max-width:768px){
-  .hdr{padding:16px 18px}
+  .hdr-top{padding:10px 16px}
+  .logos-left{gap:8px;flex-wrap:wrap}
+  .logo-text{display:none}
+  .logo-sep{display:none}
+  .hdr-title-bar{padding:12px 16px}
   .main{padding:14px 14px 40px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .charts-row{grid-template-columns:1fr}
   .lstats{display:none}
   .search-box input{width:150px}
+  .footer-inner{grid-template-columns:1fr;gap:24px}
+  .footer-inst{padding:30px 16px 0}
 }
 </style>
 </head>
@@ -185,18 +235,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
   <span>Carregando dados…</span>
 </div>
 
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-inner">
-    <div>
-      <h1 id="hdrTitle">Painel de Gestão — GT Industrialização</h1>
-      <div class="sub" id="hdrSub">Ministério das Cidades · Secretaria Nacional de Habitação</div>
+<!-- HEADER INSTITUCIONAL -->
+<div class="hdr-inst">
+  <div class="hdr-top">
+    <div class="hdr-top-inner">
+      <div class="logos-left">
+        <a href="https://www.unb.br" target="_blank" class="logo-item">
+          <div class="logo-mark unb">UnB</div>
+          <div class="logo-text">Universidade de Brasília</div>
+        </a>
+        <div class="logo-sep"></div>
+        <a href="https://www.gov.br/cidades" target="_blank" class="logo-item">
+          <div class="logo-mark mcid">MCid</div>
+          <div class="logo-text">Ministério das Cidades</div>
+        </a>
+        <div class="logo-sep"></div>
+        <a href="https://lablivre.unb.br/" target="_blank" class="logo-item">
+          <div class="logo-mark lablivre">LL</div>
+          <div class="logo-text">Lab Livre</div>
+        </a>
+        <div class="logo-sep"></div>
+        <a href="https://ceag.unb.br/" target="_blank" class="logo-item">
+          <div class="logo-mark ceag">CEAG</div>
+          <div class="logo-text">CEAG UnB</div>
+        </a>
+      </div>
+      <div class="badge"><span class="dot"></span><span id="hdrDate">–</span></div>
     </div>
-    <div class="badge"><span class="dot"></span><span id="hdrDate">–</span></div>
-    <div class="hdr-btns">
-      <button class="btn-h" onclick="expandAll()">⊞ Expandir</button>
-      <button class="btn-h" onclick="collapseAll()">⊟ Recolher</button>
-      <button class="btn-h gold" onclick="exportCSV()">↓ Exportar</button>
+  </div>
+  <div class="hdr-title-bar">
+    <div class="hdr-title-inner">
+      <div>
+        <h1 id="hdrTitle">Painel de Gestão — GT Cidades Inteligentes</h1>
+        <div class="sub" id="hdrSub">Universidade de Brasília · Ministério das Cidades</div>
+      </div>
+      <div class="hdr-btns">
+        <button class="btn-h" onclick="expandAll()">⊞ Expandir</button>
+        <button class="btn-h" onclick="collapseAll()">⊟ Recolher</button>
+        <button class="btn-h gold" onclick="exportCSV()">↓ Exportar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -226,19 +303,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 <script>
 // ── paleta de status ──────────────────────────────────────────────────────────
 const STATUS = {
-  concluido:    { label:"Concluído",    color:"#2ECC71" },
-  em_andamento: { label:"Em andamento", color:"#3498DB" },
-  em_risco:     { label:"Em risco",     color:"#F39C12" },
-  bloqueado:    { label:"Bloqueado",    color:"#E74C3C" },
-  nao_iniciado: { label:"Não iniciado", color:"#A0AEC0" },
+  concluido:    { label:"Concluído",    color:"#10B981" },
+  em_andamento: { label:"Em andamento", color:"#7A34F3" },
+  em_risco:     { label:"Em risco",     color:"#F59E0B" },
+  bloqueado:    { label:"Bloqueado",    color:"#EF4444" },
+  nao_iniciado: { label:"Não iniciado", color:"#9CA3AF" },
 };
 const PRIORIDADE = { alta:"Alta", media:"Média", baixa:"Baixa" };
 
 function pColor(p) {
-  if (p >= 75) return "#2ECC71";
-  if (p >= 40) return "#0D7377";
-  if (p >= 10) return "#F39C12";
-  return "#A0AEC0";
+  if (p >= 75) return "#10B981";
+  if (p >= 40) return "#7A34F3";
+  if (p >= 10) return "#F59E0B";
+  return "#9CA3AF";
 }
 
 // ── estado global ─────────────────────────────────────────────────────────────
@@ -395,10 +472,10 @@ function renderDonut() {
   const tot = d3.sum(pieData, d => d[1]);
   const center = g.append("text").attr("text-anchor","middle")
     .attr("dy","-.15em").attr("font-size","20px").attr("font-weight","700")
-    .attr("fill","#1B2A4A").attr("font-family","Playfair Display,serif").text(tot);
+    .attr("fill","#7A34F3").attr("font-family","Inter,sans-serif").text(tot);
   const centerLbl = g.append("text").attr("text-anchor","middle")
     .attr("dy","1.1em").attr("font-size","10px").attr("fill","#A0AEC0")
-    .attr("font-family","DM Sans,sans-serif").text("ações");
+    .attr("font-family","Inter,sans-serif").text("ações");
 
   // legenda
   document.getElementById("donutLegend").innerHTML = pieData.map(([s,v]) => `
@@ -441,7 +518,7 @@ function renderBars() {
     // label
     rg.append("text").attr("x", labelW - 6).attr("y", barH/2+1)
       .attr("text-anchor","end").attr("dominant-baseline","middle")
-      .attr("font-size","11px").attr("fill","#7A8BA0").attr("font-family","DM Sans,sans-serif")
+      .attr("font-size","11px").attr("fill","#6B7280").attr("font-family","Inter,sans-serif")
       .text(row.nome);
 
     // trilha
@@ -458,7 +535,7 @@ function renderBars() {
     rg.append("text").attr("x", labelW + xScale(100) + 8).attr("y", barH/2+1)
       .attr("dominant-baseline","middle").attr("font-size","11px")
       .attr("font-weight","700").attr("fill", pColor(row.prog))
-      .attr("font-family","DM Sans,sans-serif")
+      .attr("font-family","Inter,sans-serif")
       .text(row.prog+"%");
   });
 }
@@ -695,8 +772,8 @@ window.addEventListener("resize", () => { if(DATA) renderBars(); });
 // ── dados de demonstração (fallback sem servidor) ─────────────────────────────
 const DEMO_DATA = {
   meta: {
-    titulo: "Painel de Gestão — GT Industrialização (demo)",
-    subtitulo: "Ministério das Cidades · Secretaria Nacional de Habitação",
+    titulo: "Painel de Gestão — GT Cidades Inteligentes (demo)",
+    subtitulo: "Universidade de Brasília · Ministério das Cidades",
     atualizado_em: new Date().toISOString().slice(0,10)
   },
   linhas: [
@@ -724,5 +801,40 @@ const DEMO_DATA = {
 // ── init ──────────────────────────────────────────────────────────────────────
 loadData();
 </script>
+
+<!-- FOOTER INSTITUCIONAL -->
+<footer class="footer-inst">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-brand">
+        <div class="logo-mark unb">UnB</div>
+        <span>Universidade de Brasília</span>
+      </div>
+      <p class="footer-desc">
+        Dashboard desenvolvido pelo Lab Livre e CEAG/UnB em parceria com o
+        Ministério das Cidades para acompanhamento das ações do GT Cidades Inteligentes.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Instituições</h4>
+      <ul>
+        <li><a href="https://www.unb.br" target="_blank">Universidade de Brasília</a></li>
+        <li><a href="https://www.gov.br/cidades" target="_blank">Ministério das Cidades</a></li>
+        <li><a href="https://lablivre.unb.br/" target="_blank">Lab Livre — UnB</a></li>
+        <li><a href="https://ceag.unb.br/" target="_blank">CEAG — UnB</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <p>Lab Livre — lablivre.unb.br</p>
+      <p>CEAG — ceag.unb.br</p>
+      <p>Campus Darcy Ribeiro — Brasília/DF</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Universidade de Brasília &middot; Lab Livre &middot; CEAG. Todos os direitos reservados.</span>
+  </div>
+</footer>
+
 </body>
 </html>

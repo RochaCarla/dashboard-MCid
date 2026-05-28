@@ -21,11 +21,8 @@ from datetime import datetime
 from io import StringIO
 from pathlib import Path
 
-# ── dependências ──────────────────────────────────────────────────────────────
-try:
-    import openpyxl
-except ImportError:
-    sys.exit("Instale openpyxl:  pip install openpyxl")
+# ── dependências (openpyxl carregado sob demanda para .xlsx) ──────────────────
+openpyxl = None
 
 # ── mapeamento de colunas  (índice 0-based) ───────────────────────────────────
 # Altere aqui se a sua planilha tiver colunas em ordem diferente
@@ -102,6 +99,13 @@ def is_admin_row(text: str) -> bool:
 
 # ── leitura de linhas brutas ──────────────────────────────────────────────────
 def rows_from_xlsx(path: Path):
+    global openpyxl
+    if openpyxl is None:
+        try:
+            import openpyxl as _openpyxl
+            openpyxl = _openpyxl
+        except ImportError:
+            sys.exit("Instale openpyxl:  pip install openpyxl")
     wb = openpyxl.load_workbook(path, data_only=True)
     ws = wb.active
     raw = list(ws.iter_rows(values_only=True))
@@ -193,14 +197,18 @@ def build_json(records: list) -> dict:
 
         desc = r["tarefa"] or r["atividade"]
         counter += 1
+        status_norm = parse_status(r["status"])
+        progresso = {"concluido": 100, "em_andamento": 50, "nao_iniciado": 0,
+                     "bloqueado": 25, "em_risco": 25}.get(status_norm, 0)
+
         eixos[eid]["processos"][proc_key].append({
             "id":         int(f"{eid}{counter:03d}"),
             "atividade":  r["atividade"],
             "desc":       desc,
             "resp":       r["resp"],
-            "status":     parse_status(r["status"]),
+            "status":     status_norm,
             "prioridade": parse_prio(r["prioridade"]),
-            "progresso":  100 if parse_status(r["status"]) == "concluido" else 0,
+            "progresso":  progresso,
             "prazo":      parse_prazo(r["prazo"]),
             "notas":      "",
         })
