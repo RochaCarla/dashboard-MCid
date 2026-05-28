@@ -138,7 +138,14 @@ def rows_from_csv(path: Path):
     for enc in ("utf-8-sig", "latin-1", "cp1252", "utf-8"):
         try:
             text = path.read_text(encoding=enc)
-            reader = csv.reader(StringIO(text), delimiter=";")
+            # auto-detecta delimitador (; ou ,)
+            try:
+                dialect = csv.Sniffer().sniff(text[:2000], delimiters=";,")
+                delim = dialect.delimiter
+            except csv.Error:
+                delim = ";" if ";" in text[:500] else ","
+            print(f"  Delimitador detectado: '{delim}'")
+            reader = csv.reader(StringIO(text), delimiter=delim)
             all_rows = list(reader)
             header = all_rows[0] if all_rows else []
             data = [r for r in all_rows[1:]]

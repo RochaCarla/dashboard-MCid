@@ -1,9 +1,601 @@
 {
   "meta": {
-    "titulo": "Painel de Gestão — GT Industrialização",
-    "subtitulo": "Universidade de Brasília · Ministério das Cidades",
+    "titulo": "Teste",
+    "subtitulo": "Teste",
     "atualizado_em": "2026-05-28",
     "schema": "v2"
   },
-  "linhas": []
+  "linhas": [
+    {
+      "id": 1,
+      "nome": "Financiamento",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Prospectar demandas de investimento da cadeia produtiva",
+          "tarefas": [
+            {
+              "id": 1001,
+              "atividade": "Tratamento dos dados do questionário sobre a demanda por Capital de Giro",
+              "desc": "Análise dos dados",
+              "resp": "CEAG UnB",
+              "status": "em_andamento",
+              "prioridade": "media",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1002,
+              "atividade": "Tratamento dos dados do questionário sobre a demanda por Capital de Giro",
+              "desc": "Repassar ao BNDES as informações compiladas",
+              "resp": "CEAG UnB",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1003,
+              "atividade": "Mapear parceiros para financiamento",
+              "desc": "Mapear alternativos de parceiros de financiamento (bancos)",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 1004,
+              "atividade": "Mobilizar parceiros para linhas de financiamento fabril",
+              "desc": "Estruturas linhas de financiamento de Capital de Giro para a construção (bancos e agências de fomento)",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Apoio às construtoras PMEs",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Mapear construtoras PMEs interessadas em industrialização por UF",
+          "tarefas": [
+            {
+              "id": 2005,
+              "atividade": "SNH fará articulação com CBIC para a próxima reunião do GT",
+              "desc": "SNH fará articulação com CBIC para a próxima reunião do GT",
+              "resp": "SNH + CBIC",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Firmar parceria com SENAI para programa de capacitação",
+          "tarefas": [
+            {
+              "id": 2006,
+              "atividade": "Agenda de elaboração da parceria",
+              "desc": "Agenda de elaboração da parceria",
+              "resp": "SNH + SENAI + MDIC + financiador",
+              "status": "em_andamento",
+              "prioridade": "alta",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 2007,
+              "atividade": "Organizar encontros entre fabricantes e contrutores (piloto 5 UFs)",
+              "desc": "Organizar encontros entre fabricantes e contrutores (piloto 5 UFs)",
+              "resp": "SNH + ABCIC",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 2008,
+              "atividade": "Expandir encontros para todas as UFs",
+              "desc": "Expandir encontros para todas as UFs",
+              "resp": "SNH + CBIC",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nome": "Kits Industrializados e Off Site Parks",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Levantar documentação e experiências sobre off site parks",
+          "tarefas": [
+            {
+              "id": 3009,
+              "atividade": "Documentar modelo off site park no Ceará para replicação",
+              "desc": "SNH irá cobrar documentação do off site park no Ceará da CBICe ITIE",
+              "resp": "SNH + CBIC + ITIE",
+              "status": "em_andamento",
+              "prioridade": "baixa",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 3010,
+              "atividade": "Identificar UFs prioritárias para novos off site parks",
+              "desc": "Identificar UFs prioritárias para novos off site parks",
+              "resp": "SNH + CBIC + ITIE",
+              "status": "nao_iniciado",
+              "prioridade": "baixa",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Articular estratégia de inovação com ABCIC a partir da Rede de Inovação",
+          "tarefas": [
+            {
+              "id": 3011,
+              "atividade": "Levantamento das necessidades dos associados",
+              "desc": "Levantamento das necessidades dos associados",
+              "resp": "ABCIC",
+              "status": "em_andamento",
+              "prioridade": "baixa",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 3012,
+              "atividade": "Levantar necessidades das incorporadoras para elevar o grau de inovação no setor e das estratégias possíveis para suprir necessidades",
+              "desc": "Elaborar proposta, a partir das incorporadoras, para aprimorar o processo de inovação associado ao DATec",
+              "resp": "ABRAINC",
+              "status": "em_andamento",
+              "prioridade": "baixa",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 3013,
+              "atividade": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "desc": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "baixa",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "nome": "Equidade Regional (Programa Norte)",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Identificar as fontes de financiamento para a industrialização da Região Norte, incluindo a aquisição financiada de formas de alumínio e a formação de cadeias produtivas",
+          "tarefas": [
+            {
+              "id": 4014,
+              "atividade": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "desc": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Apoiar o desenvolvimento de novos métodos de construção que viabilizem a industrialização da construção na Região Norte",
+          "tarefas": [
+            {
+              "id": 4015,
+              "atividade": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "desc": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "resp": "CBIC + FINNIC + Sinduscon",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
+          "tarefas": [
+            {
+              "id": 4016,
+              "atividade": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "desc": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
+              "resp": "Caixa",
+              "status": "em_andamento",
+              "prioridade": "media",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "nome": "Suporte à Inovação",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Verificar novo credenciamentos na EMBRAPII",
+          "tarefas": [
+            {
+              "id": 5017,
+              "atividade": "SNH articulará reunião com EMBRAPII para verificar",
+              "desc": "SNH articulará reunião com EMBRAPII para verificar",
+              "resp": "SNH + EMBRAPII + laboratórios",
+              "status": "em_andamento",
+              "prioridade": "media",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Especializar laboratórias credenciados como instituições técnicas avaliadoras (PBQPH)",
+          "tarefas": [
+            {
+              "id": 5018,
+              "atividade": "SNH articulará reunião com EMBRAPII para verificar",
+              "desc": "SNH articulará reunião com EMBRAPII para verificar",
+              "resp": "SNH + SENAI + universidades",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Oferta de pós-graduação na temática de inovação",
+          "tarefas": [
+            {
+              "id": 5019,
+              "atividade": "SNH articulará reunião com EMBRAPII para verificar",
+              "desc": "SNH articulará reunião com EMBRAPII para verificar",
+              "resp": "SNH + UnB",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "nome": "Padronização do Código de Obras",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Aprovação da Minuta de Padronização do Código de Obras",
+          "tarefas": [
+            {
+              "id": 6020,
+              "atividade": "Apresentar proposta de referencial normativo à alta gestão do MCid",
+              "desc": "Apresentar proposta de referencial normativo à alta gestão do MCid",
+              "resp": "SNH",
+              "status": "em_andamento",
+              "prioridade": "alta",
+              "progresso": 50,
+              "prazo": "3 meses",
+              "notas": ""
+            },
+            {
+              "id": 6021,
+              "atividade": "Elaborar minuta de referencial normativo",
+              "desc": "Elaborar minuta de referencial normativo",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 6022,
+              "atividade": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
+              "desc": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
+              "resp": "SNH + CCFGTS",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 6023,
+              "atividade": "Submeter minuta(s) do referencial normativo(s) à CONJUR",
+              "desc": "Submeter minuta(s) do referencial normativo(s) à CONJUR",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 6024,
+              "atividade": "Apresentar minuta do referencial normativo ao GT",
+              "desc": "Apresentar minuta do referencial normativo ao GT",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 6025,
+              "atividade": "Publicar referencial normativo",
+              "desc": "Publicar referencial normativo",
+              "resp": "SNH + GT",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Mobilização para Implementação",
+          "tarefas": [
+            {
+              "id": 6026,
+              "atividade": "Articular adesão de municípios prioritários",
+              "desc": "Articular adesão de municípios prioritários",
+              "resp": "SNH + GT",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "nome": "Digitalização (BIM e Processos)",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Disseminar estratégia BIM como medotologia obrigatória para projetos de construção do MCMV",
+          "tarefas": [
+            {
+              "id": 7027,
+              "atividade": "Articular adesão de municípios prioritários",
+              "desc": "Articular adesão de municípios prioritários",
+              "resp": "SNH + GT",
+              "status": "bloqueado",
+              "prioridade": "media",
+              "progresso": 25,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "nome": "Descarbonização da Construção",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Operacionalizar ACT Rede de Inovação para Habitação Sustentável",
+          "tarefas": [
+            {
+              "id": 8028,
+              "atividade": "Processo de assinatura dos integrantes",
+              "desc": "Processo de assinatura dos integrantes",
+              "resp": "SNH",
+              "status": "em_andamento",
+              "prioridade": "alta",
+              "progresso": 50,
+              "prazo": "2 meses",
+              "notas": ""
+            },
+            {
+              "id": 8029,
+              "atividade": "Realizar reunião do GT Sustentabilidade do PBQP-H",
+              "desc": "Realizar reunião do GT Sustentabilidade do PBQP-H",
+              "resp": "ABCLS",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Implementar jornadas setoriais de baixo carbono via PSQs",
+          "tarefas": [
+            {
+              "id": 8030,
+              "atividade": "Realizar reunião do GT Sustentabilidade do PBQP-H",
+              "desc": "Realizar reunião do GT Sustentabilidade do PBQP-H",
+              "resp": "ABCLS",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Estruturar rede de laboratórios para inovação sustentável",
+          "tarefas": [
+            {
+              "id": 8031,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "ABCLS",
+              "status": "em_andamento",
+              "prioridade": "alta",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "nome": "Financiamento pró-soluto",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Identificar as fontes de financiamento para a industrialização da Região Norte, incluindo a aquisição financiada de formas de alumínio e a formação de cadeias produtivas",
+          "tarefas": [
+            {
+              "id": 9032,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "SNH",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Apoiar o desenvolvimento de novos métodos de construção que viabilizem a industrialização da construção na Região Norte",
+          "tarefas": [
+            {
+              "id": 9033,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "CBIC + FINNIC + Sinduscon",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        },
+        {
+          "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
+          "tarefas": [
+            {
+              "id": 9034,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "CAIXA",
+              "status": "em_andamento",
+              "prioridade": "media",
+              "progresso": 50,
+              "prazo": "",
+              "notas": ""
+            },
+            {
+              "id": 9035,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "CAIXA",
+              "status": "nao_iniciado",
+              "prioridade": "media",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "nome": "Adequação do Risco de Crédito",
+      "objetivo": "",
+      "atores": "",
+      "meta": "",
+      "processos": [
+        {
+          "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
+          "tarefas": [
+            {
+              "id": 10036,
+              "atividade": "Plano de trabalho da Rede",
+              "desc": "Plano de trabalho da Rede",
+              "resp": "CAIXA",
+              "status": "nao_iniciado",
+              "prioridade": "alta",
+              "progresso": 0,
+              "prazo": "",
+              "notas": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
