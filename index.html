@@ -211,20 +211,80 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 .footer-col p{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
 .footer-bottom{padding:16px 0;text-align:center;font-size:11px;color:rgba(255,255,255,.4)}
 
-/* responsive */
-@media(max-width:768px){
-  .hdr-top{padding:10px 16px}
-  .logos-left{gap:8px;flex-wrap:wrap}
+/* ── RESPONSIVE: Mobile < 640px ── */
+@media(max-width:639px){
+  .hdr-top{padding:8px 12px}
+  .logos-left{gap:6px;flex-wrap:wrap}
+  .logo-mark{width:28px;height:28px;font-size:10px}
   .logo-text{display:none}
   .logo-sep{display:none}
-  .hdr-title-bar{padding:12px 16px}
-  .main{padding:14px 14px 40px}
-  .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .charts-row{grid-template-columns:1fr}
+  .hdr-title-bar{padding:10px 12px}
+  .hdr-title-inner h1{font-size:14px}
+  .hdr-title-inner .sub{font-size:10px}
+  .hdr-btns{display:none}
+  .badge{font-size:10px;padding:3px 8px}
+  .main{padding:12px 12px 40px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi{padding:12px 14px}
+  .kpi-val{font-size:22px}
+  .kpi-lbl{font-size:10px}
+  .charts-row{grid-template-columns:1fr;gap:12px}
+  .donut-wrap{flex-direction:column;gap:12px}
+  .filter-bar{overflow-x:auto;flex-wrap:nowrap;gap:6px;padding-bottom:4px;
+    -webkit-overflow-scrolling:touch}
+  .filt{flex-shrink:0;padding:8px 14px;min-height:44px}
+  .search-box{margin-left:0;width:100%;margin-top:8px}
+  .search-box input{width:100%}
   .lstats{display:none}
-  .search-box input{width:150px}
-  .footer-inner{grid-template-columns:1fr;gap:24px}
-  .footer-inst{padding:30px 16px 0}
+  .linha-hdr{padding:12px 14px;gap:10px}
+  .lnum{width:32px;height:32px;font-size:13px}
+  .lname{font-size:13px}
+  .tab-area{padding:10px 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbl{min-width:600px}
+  .tbl td,.tbl th{padding:6px 8px;font-size:11px}
+  .footer-inner{grid-template-columns:1fr;gap:20px}
+  .footer-inst{padding:24px 12px 0}
+  .footer-bottom{font-size:10px}
+  .viz-section{margin-top:16px}
+  .viz-card{padding:14px 16px}
+  .viz-kpi-val{font-size:20px}
+}
+
+/* ── RESPONSIVE: Tablet 640–1023px ── */
+@media(min-width:640px) and (max-width:1023px){
+  .hdr-top{padding:10px 20px}
+  .logo-mark{width:32px;height:32px;font-size:11px}
+  .hdr-title-bar{padding:12px 20px}
+  .hdr-title-inner h1{font-size:16px}
+  .main{padding:16px 20px 40px}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+  .kpi{padding:14px 16px}
+  .kpi-val{font-size:24px}
+  .charts-row{grid-template-columns:1fr}
+  .filter-bar{flex-wrap:wrap}
+  .filt{min-height:44px}
+  .search-box input{width:180px}
+  .footer-inner{grid-template-columns:1fr;gap:28px}
+  .footer-inst{padding:30px 20px 0}
+}
+
+/* ── Touch targets ── */
+@media(pointer:coarse){
+  .filt{min-height:44px;min-width:44px}
+  .btn-h{min-height:44px;padding:10px 16px}
+  .linha-hdr{min-height:52px}
+  .search-box input{min-height:44px;font-size:16px}
+}
+
+/* ── Focus visible ── */
+:focus-visible{outline:2px solid #7A34F3;outline-offset:2px;border-radius:4px}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    transition-duration:0.01ms !important;
+  }
 }
 </style>
 </head>

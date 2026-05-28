@@ -332,9 +332,197 @@ Plot.plot({
 
 ## Responsividade
 
-- **Desktop (>1024px)**: grid 2 colunas para donut + barras; full-width para timeline e tabela
-- **Tablet (768–1024px)**: grid 1 coluna; gráficos empilhados
-- **Mobile (<768px)**: KPIs em 2 colunas; gráficos full-width; tabela com scroll horizontal
+### Princípios
+
+1. **Mobile-first**: estilos base para tela pequena; media queries adicionam complexidade para telas maiores.
+2. **Conteúdo acessível sem scroll horizontal** (exceto tabelas de dados).
+3. **Touch-friendly**: alvos de toque ≥ 44×44 px; espaçamento adequado entre elementos interativos.
+4. **Gráficos redimensionáveis**: Observable Plot recalcula `width` via `ResizeObserver`.
+5. **Hierarquia visual preservada** em todos os breakpoints: KPIs → gráficos → tabela detalhada.
+
+### Breakpoints
+
+| Token | Range | Uso |
+|-------|-------|-----|
+| `--bp-sm` | < 640px | Smartphones portrait |
+| `--bp-md` | 640px – 1023px | Smartphones landscape / tablets portrait |
+| `--bp-lg` | 1024px – 1439px | Tablets landscape / laptops |
+| `--bp-xl` | ≥ 1440px | Desktop / monitores |
+
+### Layout por breakpoint
+
+#### Mobile (< 640px)
+```
+┌─────────────────────────┐
+│ [Logo] [Logo] ... [date]│  ← logos sem texto, só ícones
+├─────────────────────────┤
+│ ████ Título GT ████████ │  ← header roxo, título 14px
+├─────────────────────────┤
+│ ┌─────────┐ ┌─────────┐ │
+│ │ KPI 1   │ │ KPI 2   │ │  ← grid 2 colunas
+│ └─────────┘ └─────────┘ │
+│ ┌─────────┐ ┌─────────┐ │
+│ │ KPI 3   │ │ KPI 4   │ │
+│ └─────────┘ └─────────┘ │
+├─────────────────────────┤
+│ [Donut: status]         │  ← full-width, legenda abaixo
+├─────────────────────────┤
+│ [Barras: progresso]     │  ← full-width
+├─────────────────────────┤
+│ [Filtros: scroll horiz] │  ← pills com scroll horizontal
+├─────────────────────────┤
+│ ┌─ Eixo 1 ───────────┐ │  ← cards colapsados
+│ │ ▶ nome   [XX%]      │ │
+│ └─────────────────────┘ │
+│   └─ Tabela (scroll-x) │  ← tabela com scroll horizontal
+└─────────────────────────┘
+```
+
+#### Tablet (640px – 1023px)
+```
+┌─────────────────────────────────────┐
+│ [Logo+texto] [Logo+texto] [date]    │
+├─────────────────────────────────────┤
+│ ██████ Título GT ██████████████████ │
+├─────────────────────────────────────┤
+│ ┌───────┐ ┌───────┐ ┌───────┐      │
+│ │ KPI 1 │ │ KPI 2 │ │ KPI 3 │      │  ← grid 3 colunas
+│ └───────┘ └───────┘ └───────┘      │
+├─────────────────────────────────────┤
+│ [Donut: status]                     │  ← full-width
+├─────────────────────────────────────┤
+│ [Barras: progresso por eixo]        │  ← full-width
+├─────────────────────────────────────┤
+│ [Filtros inline] [🔍 Busca]        │
+├─────────────────────────────────────┤
+│ Eixo cards com barra mini visível   │
+└─────────────────────────────────────┘
+```
+
+#### Desktop (≥ 1024px)
+```
+┌──────────────────────────────────────────────────┐
+│ [Logos + textos completos]              [date]   │
+├──────────────────────────────────────────────────┤
+│ ██████████ Título GT ████████████████████████████│
+├──────────────────────────────────────────────────┤
+│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐        │
+│ │KPI1 │ │KPI2 │ │KPI3 │ │KPI4 │ │KPI5 │        │  ← auto-fit
+│ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘        │
+├─────────────────────┬────────────────────────────┤
+│ [Donut]             │ [Barras progresso]         │  ← grid 1fr 2fr
+├─────────────────────┴────────────────────────────┤
+│ [Filtros inline] [🔍 Busca]                     │
+├──────────────────────────────────────────────────┤
+│ Eixo cards com barra mini + stats               │
+└──────────────────────────────────────────────────┘
+```
+
+### Componentes responsivos
+
+#### Header institucional
+| Elemento | Mobile | Tablet | Desktop |
+|----------|--------|--------|---------|
+| Logo marks | 28×28px, sem texto | 32×32px, com texto | 36×36px, com texto |
+| Separadores | hidden | visible | visible |
+| Título h1 | 14px | 16px | 18px |
+| Botões (Expandir/Recolher) | hidden | visible | visible |
+| Badge data | 10px | 12px | 12px |
+
+#### KPI cards
+| Breakpoint | Colunas | Padding | Font KPI |
+|------------|---------|---------|----------|
+| < 640px | 2 | 12px 14px | 22px |
+| 640–1023px | 3 | 14px 16px | 24px |
+| ≥ 1024px | auto-fit (min 180px) | 18px 20px | 28px |
+
+#### Gráficos (Observable Plot)
+| Breakpoint | Layout | Comportamento |
+|------------|--------|---------------|
+| < 640px | 1 coluna, full-width | `width` = container width via ResizeObserver |
+| 640–1023px | 1 coluna, full-width | Donut + legenda side-by-side |
+| ≥ 1024px | 2 colunas (1fr 2fr) | Donut à esquerda, barras à direita |
+
+```javascript
+// ResizeObserver para gráficos responsivos
+function observeResize(container, renderFn) {
+  const ro = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const width = entry.contentRect.width;
+      if (width > 0) renderFn(width);
+    }
+  });
+  ro.observe(container);
+  return ro;
+}
+```
+
+#### Filtros
+| Breakpoint | Comportamento |
+|------------|---------------|
+| < 640px | Scroll horizontal (overflow-x: auto), busca full-width abaixo |
+| 640–1023px | Flex wrap, busca ao lado |
+| ≥ 1024px | Inline com busca à direita (margin-left: auto) |
+
+#### Eixo cards
+| Breakpoint | Stats mini | Tabela interna |
+|------------|------------|----------------|
+| < 640px | Hidden (só %) | Scroll horizontal, font 11px |
+| 640–1023px | Visível | Scroll horizontal se > 5 colunas |
+| ≥ 1024px | Visível + badge contagem | Full-width |
+
+#### Tabela de tarefas
+```css
+/* Mobile: tabela com scroll horizontal */
+@media (max-width: 639px) {
+  .tab-area { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tbl { min-width: 600px; }
+  .tbl td, .tbl th { padding: 6px 8px; font-size: 11px; }
+}
+```
+
+#### Footer
+| Breakpoint | Layout | Colunas |
+|------------|--------|---------|
+| < 640px | Stack vertical | 1 coluna |
+| 640–1023px | Stack vertical | 1 coluna |
+| ≥ 1024px | Grid | 2fr 1fr 1fr |
+
+### Gráficos: regras de resize
+
+Observable Plot deve recalcular ao redimensionar:
+
+```javascript
+// No vizEngine.js, cada gráfico se auto-redimensiona
+function renderResponsiveChart(spec, container) {
+  let chart = null;
+  const render = (width) => {
+    if (chart) chart.remove();
+    spec.options.width = width;
+    chart = Plot.plot(spec.options);
+    container.querySelector('.viz-body').appendChild(chart);
+  };
+  observeResize(container, render);
+}
+```
+
+### Touch & acessibilidade
+
+- **Alvos de toque**: min 44×44px para filtros, botões, links
+- **Donut hover**: substituído por tap no mobile (toggle tooltip)
+- **Swipe**: cards de eixo suportam swipe para expandir/recolher (futuro)
+- **Contraste**: todas as combinações cor/fundo mantêm WCAG AA (4.5:1 para texto, 3:1 para UI)
+- **Focus visible**: outline 2px roxo (`#7A34F3`) com offset 2px em todos os interativos
+- **Reduced motion**: respeita `prefers-reduced-motion` para animações
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
 
 ---
 
