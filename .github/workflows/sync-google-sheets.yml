@@ -1,0 +1,53 @@
+name: Sync Google Sheets → acoes.json
+
+on:
+  # Todo dia às 8h (Brasília) = 11h UTC
+  schedule:
+    - cron: "0 11 * * *"
+  # Disparo manual pelo GitHub Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Baixar planilha e atualizar JSON
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Baixar CSV do Google Sheets
+        run: |
+          curl -sL \
+            "https://docs.google.com/spreadsheets/d/1cmkAHVQdxDbDWzz378JXgCjHZfrcbBBQgkMa3UXBVNs/export?format=csv" \
+            -o /tmp/planilha.csv
+          echo "✓ Planilha baixada ($(wc -l < /tmp/planilha.csv) linhas)"
+
+      - name: Converter CSV → JSON
+        run: |
+          python scripts/xlsx_to_json.py \
+            --file /tmp/planilha.csv \
+            --titulo "Painel de Gestão — GT Industrialização" \
+            --subtitulo "Universidade de Brasília · Ministério das Cidades" \
+            --out data/acoes.json
+
+      - name: Commit e push (se houver mudanças)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/acoes.json
+          if git diff --cached --quiet; then
+            echo "✓ Nenhuma alteração — nada a commitar."
+          else
+            git commit -m "chore: atualiza acoes.json via Google Sheets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git push
+            echo "✓ Commit e push realizados."
+          fi
