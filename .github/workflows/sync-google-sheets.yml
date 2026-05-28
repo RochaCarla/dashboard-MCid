@@ -4,9 +4,11 @@ on:
   # Todo dia às 8h (Brasília) = 11h UTC
   schedule:
     - cron: "0 11 * * *"
-  # A cada push na main
+  # A cada push na main (ignora mudanças só no JSON para evitar loop)
   push:
     branches: [main]
+    paths-ignore:
+      - 'data/acoes.json'
   # Disparo manual pelo GitHub Actions UI
   workflow_dispatch:
 
@@ -17,6 +19,9 @@ jobs:
   sync:
     name: Baixar planilha e atualizar JSON
     runs-on: ubuntu-latest
+
+    # Não roda se o commit foi feito pelo próprio bot (evita loop infinito)
+    if: github.actor != 'github-actions[bot]'
 
     steps:
       - name: Checkout
