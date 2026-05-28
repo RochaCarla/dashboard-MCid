@@ -4,6 +4,9 @@ on:
   # Todo dia às 8h (Brasília) = 11h UTC
   schedule:
     - cron: "0 11 * * *"
+  # A cada push na main
+  push:
+    branches: [main]
   # Disparo manual pelo GitHub Actions UI
   workflow_dispatch:
 
