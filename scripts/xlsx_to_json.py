@@ -402,5 +402,71 @@ def main():
     out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✓ {out}  →  {len(linhas)} eixos, {total_tarefas} tarefas")
 
+    # série histórica
+    hist_path = out.parent / "historico.json"
+    append_snapshot(linhas, hist_path)
+
+# ── série histórica ─────────────────────────────────────────────────────────
+def append_snapshot(linhas, hist_path: Path):
+    """Calcula métricas agregadas e adiciona ao histórico.
+    Não duplica se já existir snapshot do mesmo dia."""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+
+    # carrega histórico existente ou cria novo
+    if hist_path.exists():
+        historico = json.loads(hist_path.read_text(encoding="utf-8"))
+    else:
+        historico = {"snapshots": []}
+
+    # não duplica mesmo dia
+    if any(s["date"] == today for s in historico["snapshots"]):
+        print(f"⏭  Snapshot de {today} já existe — não duplicado")
+        return
+
+    # coleta todas as tarefas
+    todas = [t for l in linhas for p in l["processos"] for t in p["tarefas"]]
+    total = len(todas)
+
+    # contagem por status
+    por_status = {}
+    for t in todas:
+        s = t.get("status", "nao_iniciado")
+        por_status[s] = por_status.get(s, 0) + 1
+
+    # progresso médio geral
+    progresso_medio = round(sum(t.get("progresso", 0) for t in todas) / total, 1) if total else 0
+
+    # progresso por eixo
+    por_eixo = []
+    for l in linhas:
+        tarefas_eixo = [t for p in l["processos"] for t in p["tarefas"]]
+        n = len(tarefas_eixo)
+        prog = round(sum(t.get("progresso", 0) for t in tarefas_eixo) / n, 1) if n else 0
+        status_eixo = {}
+        for t in tarefas_eixo:
+            s = t.get("status", "nao_iniciado")
+            status_eixo[s] = status_eixo.get(s, 0) + 1
+        por_eixo.append({
+            "id": l["id"],
+            "nome": l["nome"],
+            "total": n,
+            "progresso": prog,
+            "status": status_eixo,
+        })
+
+    snapshot = {
+        "date": today,
+        "total_tarefas": total,
+        "total_eixos": len(linhas),
+        "progresso_medio": progresso_medio,
+        "por_status": por_status,
+        "por_eixo": por_eixo,
+    }
+
+    historico["snapshots"].append(snapshot)
+    historico["snapshots"].sort(key=lambda s: s["date"])
+    hist_path.write_text(json.dumps(historico, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"✓ {hist_path}  →  snapshot {today} adicionado ({len(historico['snapshots'])} total)")
+
 if __name__ == "__main__":
     main()

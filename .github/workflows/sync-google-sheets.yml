@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'data/acoes.json'
+      - 'data/historico.json'
   # Disparo manual pelo GitHub Actions UI
   workflow_dispatch:
 
@@ -51,11 +52,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/acoes.json
+          git add data/acoes.json data/historico.json
           if git diff --cached --quiet; then
             echo "✓ Nenhuma alteração — nada a commitar."
           else
-            git commit -m "chore: atualiza acoes.json via Google Sheets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git commit -m "chore: atualiza acoes.json + histórico via Google Sheets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
             git push
             echo "✓ Commit e push realizados."
           fi

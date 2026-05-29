@@ -561,14 +561,135 @@ function renderResponsiveChart(spec, container) {
 - [ ] Renderização automática de gráficos secundários
 - [ ] Suporte a `numeric_currency` (barras ordenadas)
 
-### Fase 3 — Temporal
-- [ ] Timeline/Gantt quando prazos tiverem datas reais
-- [ ] Heatmap de status ao longo do tempo (se houver histórico)
+### Fase 3 — Série histórica
+- [x] `append_snapshot()`: gera métricas agregadas a cada conversão
+- [x] `data/historico.json`: armazena snapshots diários (não duplica mesmo dia)
+- [x] Workflow commita `historico.json` junto com `acoes.json`
+- [ ] Gráfico de linha: progresso médio ao longo do tempo
+- [ ] Stacked area: evolução de status (empilhado por categoria)
+- [ ] Small multiples: progresso por eixo ao longo do tempo
+- [ ] Sparklines nos KPI cards (tendência últimos 30 dias)
 
-### Fase 4 — Avançado
+### Fase 4 — Temporal
+- [ ] Timeline/Gantt quando prazos tiverem datas reais
+- [ ] Heatmap de status ao longo do tempo (combinando histórico + prazos)
+
+### Fase 5 — Avançado
 - [ ] Treemap para distribuição orçamentária
 - [ ] Sunburst para hierarquia Eixo→Processo→Tarefa
-- [ ] Sparklines nos KPI cards (tendência)
+
+---
+
+## Série histórica
+
+### Arquitetura
+
+```
+                     ┌─────────────────────────────┐
+xlsx_to_json.py ────►│ acoes.json (estado atual)    │
+       │             └─────────────────────────────┘
+       │
+       └──────────►  ┌─────────────────────────────┐
+  append_snapshot()  │ historico.json               │
+                     │   snapshots[]:               │
+                     │     2026-05-28: {métricas}   │
+                     │     2026-05-29: {métricas}   │
+                     │     2026-05-30: {métricas}   │
+                     │     ...                      │
+                     └─────────────────────────────┘
+                                  │
+                     ┌────────────┘
+                     ▼
+              [VIZ ENGINE: gráficos temporais]
+                  │         │           │
+            Linha de    Stacked     Sparklines
+            progresso   area chart   nos KPIs
+```
+
+### Schema do `historico.json`
+
+```json
+{
+  "snapshots": [
+    {
+      "date": "2026-05-29",
+      "total_tarefas": 36,
+      "total_eixos": 10,
+      "progresso_medio": 16.0,
+      "por_status": {
+        "em_andamento": 11,
+        "nao_iniciado": 24,
+        "bloqueado": 1
+      },
+      "por_eixo": [
+        {
+          "id": 1,
+          "nome": "Financiamento",
+          "total": 4,
+          "progresso": 12.5,
+          "status": {
+            "em_andamento": 1,
+            "nao_iniciado": 3
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Regras de armazenamento
+
+- **1 snapshot por dia** — se rodar múltiplas vezes no mesmo dia, não duplica
+- **Dados agregados** — não armazena dados brutos (apenas contagens e médias)
+- **Append-only** — snapshots nunca são removidos ou editados
+- **Ordenado por data** — array sempre em ordem cronológica
+- **Sem limite de retenção** — histórico cresce ~100 linhas/snapshot
+
+### Visualizações planejadas (Fase 3)
+
+| Gráfico | Dados usados | Tipo Observable Plot |
+|---------|-------------|---------------------|
+| Progresso ao longo do tempo | `snapshots[].progresso_medio` | `Plot.lineY` |
+| Evolução de status | `snapshots[].por_status` | `Plot.areaY` (stacked) |
+| Progresso por eixo (small multiples) | `snapshots[].por_eixo[].progresso` | `Plot.lineY` + facet |
+| Sparklines nos KPIs | últimos 30 `snapshots[].progresso_medio` | SVG inline (path) |
+| Delta badges | diff entre último e penúltimo snapshot | Texto (▲ +5%, ▼ -2) |
+
+### Como o frontend carrega
+
+```javascript
+// No vizEngine.js ou index.html
+async function loadHistorico() {
+  try {
+    const r = await fetch("data/historico.json");
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+// Exemplo: gráfico de progresso ao longo do tempo
+function renderProgressTimeline(historico, container) {
+  if (!historico || historico.snapshots.length < 2) return; // precisa de ≥2 pontos
+  const data = historico.snapshots.map(s => ({
+    date: new Date(s.date),
+    progresso: s.progresso_medio,
+  }));
+  const chart = Plot.plot({
+    marks: [
+      Plot.lineY(data, {x: "date", y: "progresso", stroke: "#7A34F3", strokeWidth: 2}),
+      Plot.dot(data, {x: "date", y: "progresso", fill: "#7A34F3", r: 3}),
+      Plot.ruleY([0]),
+    ],
+    y: {label: "Progresso médio (%)", domain: [0, 100]},
+    x: {label: "Data"},
+    color: {range: ["#7A34F3"]},
+    width: container.clientWidth,
+    height: 200,
+  });
+  container.appendChild(chart);
+}
+```
 
 ---
 

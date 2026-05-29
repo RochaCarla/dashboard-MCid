@@ -10,9 +10,11 @@ Trigger phrases (PT): "gerar dashboard", "atualizar painel", "criar gitpage", "n
 ## O que esta skill entrega
 1. `index.html` — Dashboard D3.js completo (KPIs, donut chart, bar chart, tabela expansível com filtros)
 2. `data/acoes.json` — Dados estruturados extraídos da planilha ou documento
-3. `scripts/xlsx_to_json.py` — Conversor Python reutilizável (XLSX, CSV, ODS, ODT)
-4. `.github/workflows/sync-sharepoint.yml` — GitHub Actions para sincronização automática
-5. `README.md` — Guia de setup (GitHub Pages + SharePoint opcional)
+3. `data/historico.json` — Série histórica com snapshots diários (métricas agregadas)
+4. `scripts/xlsx_to_json.py` — Conversor Python reutilizável (XLSX, CSV, ODS, ODT) + gerador de snapshots
+5. `.github/workflows/sync-google-sheets.yml` — Sync diário Google Sheets + histórico
+6. `.github/workflows/sync-sharepoint.yml` — GitHub Actions para sincronização SharePoint
+7. `README.md` — Guia de setup (GitHub Pages + SharePoint opcional)
 
 ---
 
