@@ -211,6 +211,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 .footer-col p{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
 .footer-bottom{padding:16px 0;text-align:center;font-size:11px;color:rgba(255,255,255,.4)}
 
+/* ── HISTORICAL CHARTS ── */
+.hist-section{margin-bottom:24px}
+.section-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;
+  padding-bottom:8px;border-bottom:2px solid var(--primary, #7A34F3)}
+.hist-charts{grid-template-columns:1fr 1fr}
+.hist-tooltip{position:absolute;background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:8px 12px;font-size:11px;pointer-events:none;
+  box-shadow:var(--sh-sm);z-index:50;opacity:0;transition:opacity .15s}
+
 /* ── RESPONSIVE: Mobile < 640px ── */
 @media(max-width:639px){
   .hdr-top{padding:8px 12px}
@@ -229,6 +238,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   .kpi-val{font-size:22px}
   .kpi-lbl{font-size:10px}
   .charts-row{grid-template-columns:1fr;gap:12px}
+  .hist-charts{grid-template-columns:1fr}
   .donut-wrap{flex-direction:column;gap:12px}
   .filter-bar{overflow-x:auto;flex-wrap:nowrap;gap:6px;padding-bottom:4px;
     -webkit-overflow-scrolling:touch}
@@ -356,6 +366,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
     </div>
   </div>
 
+  <!-- SÉRIE HISTÓRICA -->
+  <div class="hist-section" id="histSection" style="display:none">
+    <h2 class="section-title">Evolução ao longo do tempo</h2>
+    <div class="charts-row hist-charts">
+      <div class="chart-card">
+        <h3>Progresso médio (%)</h3>
+        <svg id="histProgressSvg" style="width:100%"></svg>
+      </div>
+      <div class="chart-card">
+        <h3>Evolução por status</h3>
+        <svg id="histStatusSvg" style="width:100%"></svg>
+      </div>
+    </div>
+  </div>
+
   <div class="filter-bar" id="filterBar"></div>
   <div id="linhasContainer"></div>
 </div>
@@ -401,6 +426,7 @@ async function loadData() {
   document.getElementById("hdrDate").textContent  =
     "Atualizado em " + (DATA.meta.atualizado_em || "–");
   render();
+  loadHistorico();
 }
 
 // ── helpers (funcionam para v1 e v2) ─────────────────────────────────────────
@@ -857,6 +883,156 @@ const DEMO_DATA = {
     },
   ]
 };
+
+// ── SÉRIE HISTÓRICA ──────────────────────────────────────────────────────────
+async function loadHistorico() {
+  try {
+    const r = await fetch("data/historico.json");
+    if (!r.ok) return;
+    const hist = await r.json();
+    if (!hist.snapshots || hist.snapshots.length < 2) return;
+    document.getElementById("histSection").style.display = "";
+    renderHistProgress(hist.snapshots);
+    renderHistStatus(hist.snapshots);
+  } catch(e) { console.warn("Histórico não disponível:", e); }
+}
+
+function renderHistProgress(snapshots) {
+  const container = document.getElementById("histProgressSvg").parentElement;
+  const W = container.clientWidth - 44;
+  const H = 200;
+  const margin = {top: 20, right: 20, bottom: 40, left: 45};
+  const w = W - margin.left - margin.right;
+  const h = H - margin.top - margin.bottom;
+
+  const data = snapshots.map(s => ({ date: new Date(s.date), val: s.progresso_medio }));
+
+  const x = d3.scaleTime()
+    .domain(d3.extent(data, d => d.date))
+    .range([0, w]);
+  const y = d3.scaleLinear().domain([0, 100]).range([h, 0]);
+
+  const svg = d3.select("#histProgressSvg")
+    .attr("width", W).attr("height", H)
+    .attr("viewBox", `0 0 ${W} ${H}`);
+  svg.selectAll("*").remove();
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // grid
+  g.append("g").attr("class","grid")
+    .selectAll("line").data(y.ticks(5)).join("line")
+    .attr("x1",0).attr("x2",w).attr("y1",d=>y(d)).attr("y2",d=>y(d))
+    .attr("stroke","#E0E4EA").attr("stroke-dasharray","3,3");
+
+  // area
+  g.append("path")
+    .datum(data)
+    .attr("fill","rgba(122,52,243,0.1)")
+    .attr("d", d3.area().x(d=>x(d.date)).y0(h).y1(d=>y(d.val)).curve(d3.curveMonotoneX));
+
+  // line
+  g.append("path")
+    .datum(data)
+    .attr("fill","none").attr("stroke","#7A34F3").attr("stroke-width",2.5)
+    .attr("d", d3.line().x(d=>x(d.date)).y(d=>y(d.val)).curve(d3.curveMonotoneX));
+
+  // dots
+  g.selectAll("circle").data(data).join("circle")
+    .attr("cx",d=>x(d.date)).attr("cy",d=>y(d.val))
+    .attr("r",4).attr("fill","#7A34F3").attr("stroke","#fff").attr("stroke-width",2);
+
+  // axes
+  const formatDate = d3.timeFormat("%d/%m");
+  g.append("g").attr("transform",`translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(Math.min(data.length, 8)).tickFormat(formatDate))
+    .selectAll("text").attr("font-size","10px");
+  g.append("g")
+    .call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+"%"))
+    .selectAll("text").attr("font-size","10px");
+
+  // labels nos pontos
+  g.selectAll(".val-label").data(data).join("text")
+    .attr("class","val-label")
+    .attr("x",d=>x(d.date)).attr("y",d=>y(d.val)-10)
+    .attr("text-anchor","middle").attr("font-size","10px")
+    .attr("fill","#7A34F3").attr("font-weight","600")
+    .text(d=>d.val.toFixed(0)+"%");
+}
+
+function renderHistStatus(snapshots) {
+  const container = document.getElementById("histStatusSvg").parentElement;
+  const W = container.clientWidth - 44;
+  const H = 200;
+  const margin = {top: 20, right: 20, bottom: 40, left: 45};
+  const w = W - margin.left - margin.right;
+  const h = H - margin.top - margin.bottom;
+
+  const statusKeys = ["concluido","em_andamento","bloqueado","em_risco","nao_iniciado"];
+  const statusColors = {
+    concluido:"#10B981", em_andamento:"#7A34F3",
+    bloqueado:"#EF4444", em_risco:"#F59E0B", nao_iniciado:"#9CA3AF"
+  };
+  const statusLabels = {
+    concluido:"Concluído", em_andamento:"Em andamento",
+    bloqueado:"Bloqueado", em_risco:"Em risco", nao_iniciado:"Não iniciado"
+  };
+
+  const data = snapshots.map(s => {
+    const row = { date: new Date(s.date) };
+    statusKeys.forEach(k => row[k] = (s.por_status[k] || 0));
+    return row;
+  });
+
+  const x = d3.scaleTime().domain(d3.extent(data, d=>d.date)).range([0, w]);
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => statusKeys.reduce((s,k) => s + d[k], 0))])
+    .range([h, 0]);
+
+  const stack = d3.stack().keys(statusKeys)(data);
+
+  const svg = d3.select("#histStatusSvg")
+    .attr("width", W).attr("height", H)
+    .attr("viewBox", `0 0 ${W} ${H}`);
+  svg.selectAll("*").remove();
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // stacked areas
+  const area = d3.area()
+    .x(d => x(d.data.date))
+    .y0(d => y(d[0]))
+    .y1(d => y(d[1]))
+    .curve(d3.curveMonotoneX);
+
+  g.selectAll(".layer").data(stack).join("path")
+    .attr("class","layer")
+    .attr("d", area)
+    .attr("fill", d => statusColors[d.key])
+    .attr("opacity", 0.8);
+
+  // axes
+  const formatDate = d3.timeFormat("%d/%m");
+  g.append("g").attr("transform",`translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(Math.min(data.length, 8)).tickFormat(formatDate))
+    .selectAll("text").attr("font-size","10px");
+  g.append("g")
+    .call(d3.axisLeft(y).ticks(5))
+    .selectAll("text").attr("font-size","10px");
+
+  // legend
+  const legend = d3.select(container).append("div")
+    .style("display","flex").style("flex-wrap","wrap")
+    .style("gap","12px").style("margin-top","10px").style("justify-content","center");
+  statusKeys.filter(k => data.some(d => d[k] > 0)).forEach(k => {
+    const item = legend.append("span")
+      .style("display","flex").style("align-items","center")
+      .style("gap","4px").style("font-size","11px").style("color","#5A6B7A");
+    item.append("span")
+      .style("width","10px").style("height","10px")
+      .style("border-radius","2px").style("background",statusColors[k])
+      .style("display","inline-block");
+    item.append("span").text(statusLabels[k]);
+  });
+}
 
 // ── init ──────────────────────────────────────────────────────────────────────
 loadData();
