@@ -9,13 +9,23 @@ Motor embarcado no dashboard-gt que **analisa automaticamente os dados do JSON**
 ## Arquitetura
 
 ```
-CSV/XLSX → xlsx_to_json.py → acoes.json → [VIZ ENGINE] → Dashboard
-                                                ↓
-                                        1. Detecta tipos de coluna
-                                        2. Classifica dimensões
-                                        3. Seleciona visualização
-                                        4. Renderiza com Observable Plot
+CSV/XLSX/ODS/ODT → xlsx_to_json.py (v3) → acoes.json → [VIZ ENGINE] → Dashboard
+      ↑                                                      ↓
+  Google Sheets                                     1. Detecta tipos de coluna
+  (export CSV)                                      2. Classifica dimensões
+                                                    3. Seleciona visualização
+                                                    4. Renderiza com Observable Plot
 ```
+
+### Formatos de entrada suportados
+
+| Formato | Extensão | Dependência | Como funciona |
+|---------|----------|-------------|---------------|
+| Excel | .xlsx/.xls | openpyxl | Leitura direta de células |
+| CSV | .csv | nenhuma | Auto-detect delimitador (`,`/`;`) e encoding |
+| ODS | .ods | nenhuma | ZIP → content.xml → tabelas ODF |
+| ODT | .odt | nenhuma | ZIP → content.xml → extrai maior `<table:table>` |
+| Google Sheets | URL | nenhuma (curl) | Export CSV via URL pública |
 
 O motor roda **no frontend** (JavaScript), analisando o JSON em tempo de carga. Não requer backend.
 

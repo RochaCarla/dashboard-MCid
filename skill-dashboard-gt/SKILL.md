@@ -1,16 +1,16 @@
 # Skill: Dashboard GitHub Pages — Gestão de Ações GT
 
 ## Quando usar esta skill
-Invoke when the user wants to **generate or update a GitHub Pages BI dashboard** from a spreadsheet (Excel/CSV) that tracks action lines ("linhas de atuação") with fields like Linha, Ação, Responsável, Status, Prioridade, Progresso, Prazo.
+Invoke when the user wants to **generate or update a GitHub Pages BI dashboard** from a spreadsheet (Excel/CSV/ODS) or a document (ODT) that tracks action lines ("linhas de atuação") with fields like Linha, Ação, Responsável, Status, Prioridade, Progresso, Prazo.
 
-Trigger phrases (PT): "gerar dashboard", "atualizar painel", "criar gitpage", "novo dashboard da planilha", "dashboard das ações"
+Trigger phrases (PT): "gerar dashboard", "atualizar painel", "criar gitpage", "novo dashboard da planilha", "dashboard das ações", "dashboard do odt", "importar documento"
 
 ---
 
 ## O que esta skill entrega
 1. `index.html` — Dashboard D3.js completo (KPIs, donut chart, bar chart, tabela expansível com filtros)
-2. `data/acoes.json` — Dados estruturados extraídos da planilha
-3. `scripts/xlsx_to_json.py` — Conversor Python reutilizável
+2. `data/acoes.json` — Dados estruturados extraídos da planilha ou documento
+3. `scripts/xlsx_to_json.py` — Conversor Python reutilizável (XLSX, CSV, ODS, ODT)
 4. `.github/workflows/sync-sharepoint.yml` — GitHub Actions para sincronização automática
 5. `README.md` — Guia de setup (GitHub Pages + SharePoint opcional)
 
@@ -20,20 +20,31 @@ Trigger phrases (PT): "gerar dashboard", "atualizar painel", "criar gitpage", "n
 
 ### PASSO 1 — Coletar informações
 Antes de gerar qualquer arquivo, pergunte (use AskUserQuestion):
-- **Fonte dos dados**: Arquivo local (.xlsx/.csv) ou URL SharePoint?
+- **Fonte dos dados**: Arquivo local (.xlsx/.csv/.ods/.odt) ou URL SharePoint/Google Sheets?
 - **Nome do projeto**: Título do dashboard (ex: "GT Industrialização")
 - **Subtítulo**: Organização / secretaria
 - **Estrutura da planilha**: O usuário deve fornecer o arquivo OU descrever as colunas
 
-### PASSO 2 — Analisar a planilha
-Se o arquivo for fornecido:
+### PASSO 2 — Analisar a fonte de dados
+
+O conversor `xlsx_to_json.py` (v3) aceita 4 formatos:
+
+| Formato | Extensão | Dependência | Notas |
+|---------|----------|-------------|-------|
+| Excel | .xlsx/.xls | openpyxl | Padrão corporativo |
+| CSV | .csv | nenhuma | Auto-detect delimitador (`,` ou `;`) e encoding |
+| ODS | .ods | nenhuma | OpenDocument Spreadsheet (LibreOffice) |
+| ODT | .odt | nenhuma | OpenDocument Text — extrai a maior tabela embutida |
+
+**Para ODT**: o conversor abre o ZIP, parseia `content.xml`, encontra a maior `<table:table>` e extrai as linhas como se fosse planilha.
+
 ```python
-# Use bash para ler o arquivo
-import openpyxl, csv
-# Identifique automaticamente:
-# - Índice de cada coluna (Linha, Ação, Responsável, Status, Prioridade, Prazo)
+# Identifica automaticamente:
+# - Formato pelo sufixo do arquivo
+# - Índice de cada coluna (layout 8 ou 9 colunas)
+# - Delimitador CSV (; ou ,) via csv.Sniffer
 # - Valores únicos de Status e Prioridade (para normalização)
-# - Número de linhas de atuação
+# - Número de eixos temáticos
 ```
 
 Se for CSV com encoding problemático:
@@ -49,6 +60,8 @@ with open('arquivo.csv','rb') as f:
 Execute o conversor adaptando COL_* para as colunas detectadas:
 ```bash
 python scripts/xlsx_to_json.py --file "Ações.xlsx" --out data/acoes.json
+# Também aceita: .csv, .ods, .odt
+python scripts/xlsx_to_json.py --file "documento.odt" --out data/acoes.json
 ```
 
 Se o arquivo tiver encoding não-UTF-8:
@@ -167,9 +180,11 @@ Para suportar múltiplos GTs no mesmo dashboard:
 
 ## Arquivos de referência
 - Template dashboard: `dashboard-gt/index.html`
-- Conversor: `dashboard-gt/scripts/xlsx_to_json.py`
-- Workflow: `dashboard-gt/.github/workflows/sync-sharepoint.yml`
+- Conversor (v3): `dashboard-gt/scripts/xlsx_to_json.py` — aceita XLSX, CSV, ODS, ODT
+- Workflow SharePoint: `dashboard-gt/.github/workflows/sync-sharepoint.yml`
+- Workflow Google Sheets: `dashboard-gt/.github/workflows/sync-google-sheets.yml`
 - Dados exemplo: `dashboard-gt/data/acoes.json`
+- Spec viz engine: `dashboard-gt/docs/SPEC-VIZ-ENGINE.md`
 
 ## Verificação final
 Antes de entregar:

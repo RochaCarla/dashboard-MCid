@@ -1,11 +1,18 @@
 """
-xlsx_to_json.py  —  v2
-Converte Ações.xlsx (estrutura: Eixo Temático → Processo → Atividade → Tarefa)
+xlsx_to_json.py  —  v3
+Converte planilhas de ações (XLSX, CSV, ODS ou ODT com tabela embutida)
 para data/acoes.json usado pelo dashboard GitHub Pages.
+
+Formatos suportados:
+    .xlsx / .xls  — Excel (requer openpyxl)
+    .csv          — CSV com auto-detect de delimitador e encoding
+    .ods          — OpenDocument Spreadsheet (sem dependência externa)
+    .odt          — OpenDocument Text com tabela embutida (sem dependência externa)
 
 Uso local:
     python scripts/xlsx_to_json.py --file "Ações.xlsx"
-    python scripts/xlsx_to_json.py --file "planilha.csv"   # CSV Latin-1 também funciona
+    python scripts/xlsx_to_json.py --file "planilha.csv"
+    python scripts/xlsx_to_json.py --file "documento.odt"
 
 Uso no GitHub Actions (SharePoint):
     python scripts/xlsx_to_json.py \
@@ -15,11 +22,12 @@ Uso no GitHub Actions (SharePoint):
         --client-secret "$CLIENT_SECRET"
 """
 
-import argparse, csv, json, re, sys
+import argparse, csv, json, re, sys, zipfile
 from collections import OrderedDict
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 # ── dependências (openpyxl carregado sob demanda para .xlsx) ──────────────────
 openpyxl = None
@@ -154,14 +162,74 @@ def rows_from_csv(path: Path):
             continue
     sys.exit("Não foi possível decodificar o arquivo CSV.")
 
+def rows_from_odt(path: Path):
+    """Extrai tabelas de arquivos ODS (.ods) ou ODT (.odt) usando zipfile + xml.
+    Ambos são arquivos ZIP contendo content.xml com tabelas ODF."""
+    NS = {
+        "table": "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+        "text":  "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+        "office": "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+    }
+    try:
+        with zipfile.ZipFile(path) as zf:
+            content = zf.read("content.xml")
+    except (zipfile.BadZipFile, KeyError) as e:
+        sys.exit(f"Arquivo ODT/ODS inválido: {e}")
+
+    root = ET.fromstring(content)
+    # Encontra todas as tabelas no documento
+    tables = root.findall(".//table:table", NS)
+    if not tables:
+        sys.exit("Nenhuma tabela encontrada no documento ODT/ODS.")
+
+    # Usa a maior tabela (mais linhas)
+    best_table = max(tables, key=lambda t: len(t.findall("table:table-row", NS)))
+    table_name = best_table.get(f"{{{NS['table']}}}name", "(sem nome)")
+    print(f"  Tabela selecionada: '{table_name}'")
+
+    all_rows = []
+    for tr in best_table.findall("table:table-row", NS):
+        # Respeita table:number-rows-repeated
+        row_repeat = int(tr.get(f"{{{NS['table']}}}number-rows-repeated", "1"))
+        cells = []
+        for tc in tr.findall("table:table-cell", NS):
+            col_repeat = int(tc.get(f"{{{NS['table']}}}number-columns-repeated", "1"))
+            # Extrai texto de todos os <text:p> dentro da célula
+            text_parts = []
+            for p in tc.findall(".//text:p", NS):
+                text_parts.append("".join(p.itertext()))
+            cell_text = "\n".join(text_parts)
+            cells.extend([cell_text] * col_repeat)
+        # Ignora linhas completamente vazias no final
+        if any(c.strip() for c in cells):
+            for _ in range(min(row_repeat, 1)):  # só 1 cópia de linhas com conteúdo
+                all_rows.append(cells)
+
+    if not all_rows:
+        sys.exit("Tabela encontrada mas sem dados.")
+
+    # Detecta cabeçalho
+    hdr = 0
+    for i, row in enumerate(all_rows[:6]):
+        if any("eixo" in str(c or "").lower() or "linha" in str(c or "").lower()
+               or "prioridade" in str(c or "").lower() for c in row):
+            hdr = i; break
+
+    header = all_rows[hdr]
+    data = all_rows[hdr+1:]
+    print(f"  {len(data)} linhas de dados extraídas do ODT/ODS")
+    return header, data
+
 def read_file(path: Path):
     suf = path.suffix.lower()
     if suf in (".xlsx", ".xls"):
         return rows_from_xlsx(path)
     elif suf == ".csv":
         return rows_from_csv(path)
+    elif suf in (".odt", ".ods"):
+        return rows_from_odt(path)
     else:
-        sys.exit(f"Formato não suportado: {suf}. Use .xlsx ou .csv")
+        sys.exit(f"Formato não suportado: {suf}. Use .xlsx, .csv, .ods ou .odt")
 
 def setup_columns(header):
     global COL_PRIORIDADE, COL_PRAZO1, COL_EIXO, COL_PROCESSO
