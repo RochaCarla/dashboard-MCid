@@ -24,7 +24,7 @@ Uso no GitHub Actions (SharePoint):
 
 import argparse, csv, json, re, sys, zipfile
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -399,6 +399,10 @@ def main():
     p.add_argument("--out", default="data/acoes.json")
     p.add_argument("--titulo",    default="Painel de Gestão — GT Industrialização")
     p.add_argument("--subtitulo", default="Ministério das Cidades · Secretaria Nacional de Habitação")
+    p.add_argument("--proxima-reuniao", default="",
+                   help="data da próxima reunião do GT (YYYY-MM-DD); vazio oculta o campo")
+    p.add_argument("--guardia", default="Equipe CEAG",
+                   help="responsável pela manutenção da base")
     args = p.parse_args()
 
     if args.file:
@@ -418,12 +422,16 @@ def main():
     linhas   = build_json(records)
 
     total_tarefas = sum(len(p2["tarefas"]) for l in linhas for p2 in l["processos"])
+    now = datetime.now(timezone.utc)
     data = {
         "meta": {
-            "titulo":       args.titulo,
-            "subtitulo":    args.subtitulo,
-            "atualizado_em": datetime.utcnow().strftime("%Y-%m-%d"),
-            "schema":       "v2",
+            "titulo":          args.titulo,
+            "subtitulo":       args.subtitulo,
+            "atualizado_em":   now.strftime("%Y-%m-%d"),
+            "sincronizado_em": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "proxima_reuniao": args.proxima_reuniao,
+            "guardia":         args.guardia,
+            "schema":          "v2",
         },
         "linhas": linhas,
     }
@@ -441,7 +449,7 @@ def main():
 def append_snapshot(linhas, hist_path: Path):
     """Calcula métricas agregadas e adiciona ao histórico.
     Se já houver snapshot do mesmo dia, ele é substituído pelo estado atual."""
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     # carrega histórico existente ou cria novo
     if hist_path.exists():

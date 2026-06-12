@@ -46,6 +46,8 @@ O formato principal é **v2** (Linha → Processos → Tarefas). O schema v1 (Li
 
 **Legado:** Sincronização via SharePoint (workflow existe mas não está ativo; requer Azure AD App Registration).
 
+O conversor grava em `meta` os campos `sincronizado_em` (timestamp UTC), `proxima_reuniao` e `guardia`, exibidos no card "Atualização" do dashboard. A data da próxima reunião do GT é configurada no workflow (`--proxima-reuniao`); campo vazio fica oculto.
+
 ### Regras de parsing do CSV
 
 - Fonte: export CSV do Google Sheets (UTF-8, separador `,`); o script auto-detecta delimitador e encoding.

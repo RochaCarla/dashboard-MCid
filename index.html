@@ -220,6 +220,37 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   border-radius:6px;padding:8px 12px;font-size:11px;pointer-events:none;
   box-shadow:var(--sh-sm);z-index:50;opacity:0;transition:opacity .15s}
 
+/* ── STATUS CONSOLIDADO (legenda com contagens) ── */
+.donut-legend{flex:1;min-width:140px}
+.legend-item{width:100%}
+.legend-lbl{flex:1}
+.legend-cnt{font-weight:700;color:var(--navy);font-family:'Inter',sans-serif}
+
+/* ── CARD ATUALIZAÇÃO ── */
+.upd-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.upd-item:last-child{border-bottom:none;padding-bottom:0}
+.upd-lbl{font-size:10px;color:var(--text-l);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.upd-val{font-size:14px;font-weight:600;color:var(--navy);margin-top:3px}
+.upd-val.link{color:var(--primary, #7A34F3)}
+.charts-row.top-row{grid-template-columns:minmax(280px,4fr) 6fr minmax(210px,3fr)}
+@media(max-width:1023px){.charts-row.top-row{grid-template-columns:1fr}}
+
+/* ── ALERTAS ── */
+.alert-section{margin-bottom:24px}
+.section-title.alert-title{border-bottom-color:var(--err)}
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.alert-card{border-radius:var(--r);padding:12px 14px;border:1px solid;border-left-width:4px;
+  cursor:pointer;transition:var(--tr)}
+.alert-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.alert-card.a-venc {background:#FEF2F2;border-color:#FECACA;border-left-color:var(--err)}
+.alert-card.a-bloq {background:#FFF7ED;border-color:#FED7AA;border-left-color:#F97316}
+.alert-card.a-risco{background:#FFFBEB;border-color:#FDE68A;border-left-color:var(--warn)}
+.alert-desc{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.35}
+.alert-meta{font-size:11px;color:var(--text-m);margin-top:5px;line-height:1.4}
+.alert-card.a-venc  .alert-reason{color:var(--err);font-weight:700}
+.alert-card.a-bloq  .alert-reason{color:#EA580C;font-weight:700}
+.alert-card.a-risco .alert-reason{color:#B45309;font-weight:700}
+
 /* ── RESPONSIVE: Mobile < 640px ── */
 @media(max-width:639px){
   .hdr-top{padding:8px 12px}
@@ -352,18 +383,28 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 <div class="main">
   <div class="kpi-grid" id="kpiGrid"></div>
 
-  <div class="charts-row">
+  <div class="charts-row top-row">
     <div class="chart-card">
-      <h3>Status das Ações</h3>
+      <h3>Status Consolidado do GT</h3>
       <div class="donut-wrap">
         <svg id="donutSvg"></svg>
         <div class="donut-legend" id="donutLegend"></div>
       </div>
     </div>
     <div class="chart-card">
-      <h3>Progresso por Linha de Atuação</h3>
+      <h3>Progresso por Eixo Temático</h3>
       <svg id="barSvg" style="width:100%"></svg>
     </div>
+    <div class="chart-card">
+      <h3>Atualização</h3>
+      <div id="updCard"></div>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  <div class="alert-section" id="alertSection" style="display:none">
+    <h2 class="section-title alert-title">⚠ Alertas — ações bloqueadas ou com prazo vencido</h2>
+    <div class="alert-grid" id="alertGrid"></div>
   </div>
 
   <!-- SÉRIE HISTÓRICA -->
@@ -487,8 +528,62 @@ function render() {
   renderKPIs();
   renderDonut();
   renderBars();
+  renderAtualizacao();
+  renderAlertas();
   renderFilterBar();
   renderLinhas();
+}
+
+// ── card Atualização ──────────────────────────────────────────────────────────
+function fmtDateTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString("pt-BR") + " · " +
+         String(d.getHours()).padStart(2,"0") + "h" + String(d.getMinutes()).padStart(2,"0");
+}
+
+function renderAtualizacao() {
+  const m = DATA.meta || {};
+  const rows = [
+    { lbl: "Última sincronização",
+      val: m.sincronizado_em ? fmtDateTime(m.sincronizado_em) : fmtDate(m.atualizado_em), cls: "" },
+  ];
+  if (m.proxima_reuniao) rows.push({ lbl: "Próxima reunião GT", val: fmtDate(m.proxima_reuniao), cls: "link" });
+  rows.push({ lbl: "Guardiã da base", val: m.guardia || "Equipe CEAG", cls: "" });
+
+  document.getElementById("updCard").innerHTML = rows.map(r => `
+    <div class="upd-item">
+      <div class="upd-lbl">${r.lbl}</div>
+      <div class="upd-val ${r.cls}">${r.val}</div>
+    </div>`).join("");
+}
+
+// ── alertas: bloqueadas, em risco ou com prazo vencido ───────────────────────
+function renderAlertas() {
+  const eixoNome = {};
+  DATA.linhas.forEach(l => eixoNome[l.id] = l.nome);
+
+  const alerts = [];
+  allAcoes().forEach(a => {
+    if (isOverdue(a))                  alerts.push({ a, cls: "a-venc",  motivo: "prazo vencido — " + fmtDate(a.prazo), ord: 0 });
+    else if (a.status === "bloqueado") alerts.push({ a, cls: "a-bloq",  motivo: "bloqueada", ord: 1 });
+    else if (a.status === "em_risco")  alerts.push({ a, cls: "a-risco", motivo: "em risco", ord: 2 });
+  });
+
+  const sec = document.getElementById("alertSection");
+  if (!alerts.length) { sec.style.display = "none"; return; }
+  alerts.sort((x, y) => x.ord - y.ord);
+  sec.style.display = "";
+  document.getElementById("alertGrid").innerHTML = alerts.map(({a, cls, motivo}) => `
+    <div class="alert-card ${cls}" onclick="goToLinha(${a.linhaId})">
+      <div class="alert-desc">${a.desc}</div>
+      <div class="alert-meta">${eixoNome[a.linhaId] || ""} · <span class="alert-reason">${motivo}</span>${a.resp ? " · resp: " + a.resp : ""}</div>
+    </div>`).join("");
+}
+
+function goToLinha(id) {
+  const el = document.getElementById(`linha-${id}`);
+  if (el) { el.classList.add("open"); el.scrollIntoView({behavior:"smooth", block:"center"}); }
 }
 
 // ── KPIs ──────────────────────────────────────────────────────────────────────
@@ -552,23 +647,24 @@ function renderDonut() {
       })
       .on("mouseout", function() {
         d3.select(this).transition().duration(150).attr("d", arc);
-        const tot = d3.sum(pieData, d => d[1]);
-        center.text(tot); centerLbl.text("ações");
+        center.text(pctDone+"%"); centerLbl.text("concluído");
       });
 
   const tot = d3.sum(pieData, d => d[1]);
+  const pctDone = tot ? Math.round((counts.concluido || 0) / tot * 100) : 0;
   const center = g.append("text").attr("text-anchor","middle")
     .attr("dy","-.15em").attr("font-size","20px").attr("font-weight","700")
-    .attr("fill","#7A34F3").attr("font-family","Inter,sans-serif").text(tot);
+    .attr("fill","#7A34F3").attr("font-family","Inter,sans-serif").text(pctDone+"%");
   const centerLbl = g.append("text").attr("text-anchor","middle")
     .attr("dy","1.1em").attr("font-size","10px").attr("fill","#A0AEC0")
-    .attr("font-family","Inter,sans-serif").text("ações");
+    .attr("font-family","Inter,sans-serif").text("concluído");
 
-  // legenda
+  // legenda com contagens (status consolidado)
   document.getElementById("donutLegend").innerHTML = pieData.map(([s,v]) => `
     <div class="legend-item">
       <div class="legend-dot" style="background:${STATUS[s].color}"></div>
-      <span>${STATUS[s].label} <strong>(${v})</strong></span>
+      <span class="legend-lbl">${STATUS[s].label}</span>
+      <span class="legend-cnt">${v}</span>
     </div>`).join("");
 }
 

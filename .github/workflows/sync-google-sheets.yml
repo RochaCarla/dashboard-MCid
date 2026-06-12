@@ -46,6 +46,8 @@ jobs:
             --file /tmp/planilha.csv \
             --titulo "Painel de Gestão — GT Industrialização" \
             --subtitulo "Universidade de Brasília · Ministério das Cidades" \
+            --proxima-reuniao "2026-06-18" \
+            --guardia "Equipe CEAG" \
             --out data/acoes.json
 
       - name: Commit e push (se houver mudanças)
