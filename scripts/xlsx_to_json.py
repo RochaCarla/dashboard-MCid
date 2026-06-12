@@ -33,21 +33,38 @@ from xml.etree import ElementTree as ET
 openpyxl = None
 
 # ── mapeamento de colunas  (índice 0-based) ───────────────────────────────────
-# Detecta automaticamente 8 colunas (sem Prazo duplicado) ou 9 colunas
-# Layout 8 colunas: Prioridade | Prazo | Eixo | Processo | Atividade | Tarefa | Responsável | Status
-# Layout 9 colunas: Prioridade | Prazo(ignorar) | Eixo | Processo | Atividade | Tarefa | Responsável | Prazo | Status
+# Detecta colunas pelo NOME no cabeçalho (a planilha pode reordenar colunas).
+# Se o cabeçalho não tiver nomes reconhecíveis, cai no layout posicional legado:
+#   8 colunas: Prioridade | Prazo | Eixo | Processo | Atividade | Tarefa | Responsável | Status
+#   9 colunas: Prioridade | Prazo(ignorar) | Eixo | Processo | Atividade | Tarefa | Responsável | Prazo | Status
 def detect_columns(header_row):
+    names = [norm(c).lower() for c in header_row]
+
+    def find(*terms):
+        for i, n in enumerate(names):
+            if any(t in n for t in terms):
+                return i
+        return None
+
+    eixo = find("eixo", "linha")
+    if eixo is not None:
+        # quando há duas colunas "Prazo" (legado), a última é o prazo da tarefa
+        prazos = [i for i, n in enumerate(names) if "prazo" in n]
+        return {"prioridade": find("prioridade"), "eixo": eixo,
+                "processo": find("processo"), "atividade": find("atividade"),
+                "tarefa": find("tarefa"), "resp": find("respons"),
+                "prazo": prazos[-1] if prazos else None, "status": find("status")}
+
     ncols = len(header_row)
     if ncols <= 8:
-        return {"prioridade": 0, "prazo1": 1, "eixo": 2, "processo": 3,
+        return {"prioridade": 0, "eixo": 2, "processo": 3,
                 "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 1, "status": 7}
     else:
-        return {"prioridade": 0, "prazo1": 1, "eixo": 2, "processo": 3,
+        return {"prioridade": 0, "eixo": 2, "processo": 3,
                 "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 7, "status": 8}
 
 # defaults (overridden by detect_columns)
 COL_PRIORIDADE = 0
-COL_PRAZO1     = 1
 COL_EIXO       = 2
 COL_PROCESSO   = 3
 COL_ATIVIDADE  = 4
@@ -232,11 +249,10 @@ def read_file(path: Path):
         sys.exit(f"Formato não suportado: {suf}. Use .xlsx, .csv, .ods ou .odt")
 
 def setup_columns(header):
-    global COL_PRIORIDADE, COL_PRAZO1, COL_EIXO, COL_PROCESSO
+    global COL_PRIORIDADE, COL_EIXO, COL_PROCESSO
     global COL_ATIVIDADE, COL_TAREFA, COL_RESP, COL_PRAZO, COL_STATUS
     cols = detect_columns(header)
     COL_PRIORIDADE = cols["prioridade"]
-    COL_PRAZO1     = cols["prazo1"]
     COL_EIXO       = cols["eixo"]
     COL_PROCESSO   = cols["processo"]
     COL_ATIVIDADE  = cols["atividade"]
@@ -245,16 +261,19 @@ def setup_columns(header):
     COL_PRAZO      = cols["prazo"]
     COL_STATUS     = cols["status"]
     ncols = len(header)
-    print(f"  Layout detectado: {ncols} colunas → Status na col {COL_STATUS}")
+    print(f"  Layout detectado: {ncols} colunas → Eixo na col {COL_EIXO}, Status na col {COL_STATUS}")
 
 # ── parse + agrupamento ───────────────────────────────────────────────────────
 def parse_rows(raw_rows) -> list:
     def cell(row, idx, default=""):
+        if idx is None: return default
         try: return norm(row[idx]) if row[idx] is not None else default
         except IndexError: return default
 
-    # propaga contexto (células mescladas ficam vazias nas linhas seguintes)
-    prev = {}
+    # propaga contexto (células mescladas ficam vazias nas linhas seguintes),
+    # respeitando a hierarquia: mudar de Eixo invalida Processo/Atividade
+    # herdados; mudar de Processo invalida Atividade herdada.
+    prev = {"eixo": "", "processo": "", "atividade": ""}
     records = []
     for row in raw_rows:
         r = {
@@ -267,16 +286,23 @@ def parse_rows(raw_rows) -> list:
             "prazo":      cell(row, COL_PRAZO),
             "status":     cell(row, COL_STATUS),
         }
-        # herda campos não preenchidos da linha anterior
-        for k in ("eixo", "processo", "atividade", "prioridade", "resp"):
-            if not r[k]:
-                r[k] = prev.get(k, "")
-        prev = {k: r[k] for k in r}
+        if not r["eixo"]:
+            r["eixo"] = prev["eixo"]
+        elif r["eixo"] != prev["eixo"]:
+            prev["processo"] = prev["atividade"] = ""
 
-        # filtra linhas sem tarefa nem atividade útil
-        if not r["tarefa"] and not r["atividade"]:
-            continue
-        if r["eixo"] and is_admin_row(r["eixo"]):
+        if not r["processo"]:
+            r["processo"] = prev["processo"]
+        elif r["processo"] != prev["processo"]:
+            prev["atividade"] = ""
+
+        if not r["atividade"]:
+            r["atividade"] = prev["atividade"]
+
+        prev = {"eixo": r["eixo"], "processo": r["processo"],
+                "atividade": r["atividade"]}
+
+        if not r["eixo"] or is_admin_row(r["eixo"]):
             continue
 
         records.append(r)
@@ -301,11 +327,16 @@ def build_json(records: list) -> dict:
                 "processos": OrderedDict(),
             }
 
+        # linha só com Eixo (sem processo/atividade/tarefa): registra o eixo,
+        # mas não cria tarefa
+        desc = r["tarefa"] or r["atividade"] or r["processo"]
+        if not desc:
+            continue
+
         proc_key = r["processo"] or r["atividade"] or "Geral"
         if proc_key not in eixos[eid]["processos"]:
             eixos[eid]["processos"][proc_key] = []
 
-        desc = r["tarefa"] or r["atividade"]
         counter += 1
         status_norm = parse_status(r["status"])
         progresso = {"concluido": 100, "em_andamento": 50, "nao_iniciado": 0,
@@ -409,7 +440,7 @@ def main():
 # ── série histórica ─────────────────────────────────────────────────────────
 def append_snapshot(linhas, hist_path: Path):
     """Calcula métricas agregadas e adiciona ao histórico.
-    Não duplica se já existir snapshot do mesmo dia."""
+    Se já houver snapshot do mesmo dia, ele é substituído pelo estado atual."""
     today = datetime.utcnow().strftime("%Y-%m-%d")
 
     # carrega histórico existente ou cria novo
@@ -418,10 +449,8 @@ def append_snapshot(linhas, hist_path: Path):
     else:
         historico = {"snapshots": []}
 
-    # não duplica mesmo dia
-    if any(s["date"] == today for s in historico["snapshots"]):
-        print(f"⏭  Snapshot de {today} já existe — não duplicado")
-        return
+    # substitui snapshot do mesmo dia (mantém o estado mais recente)
+    historico["snapshots"] = [s for s in historico["snapshots"] if s["date"] != today]
 
     # coleta todas as tarefas
     todas = [t for l in linhas for p in l["processos"] for t in p["tarefas"]]

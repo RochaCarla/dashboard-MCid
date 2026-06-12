@@ -42,20 +42,21 @@ O formato principal é **v2** (Linha → Processos → Tarefas). O schema v1 (Li
 
 ## Fluxo de dados
 
-**Atual:** Manual — alguém roda `scripts/xlsx_to_json.py` sobre a planilha e faz commit/push do `data/acoes.json`.
+**Atual:** Automático — o workflow `sync-google-sheets.yml` baixa diariamente (11h UTC) o CSV do Google Sheets, roda `scripts/xlsx_to_json.py` e commita `data/acoes.json` + `data/historico.json`.
 
-**Aspiracional:** Sincronização automática via GitHub Actions + SharePoint (requer Azure AD App Registration; workflow existe mas não está ativo).
+**Legado:** Sincronização via SharePoint (workflow existe mas não está ativo; requer Azure AD App Registration).
 
 ### Regras de parsing do CSV
 
-- Separador: `;`
-- Encoding: `latin-1` (cp1252)
-- Colunas: Prioridade | ~~Prazo~~ (ignorar) | Eixo Temático | Processo | Atividade | Tarefa | Responsável | Prazo | Status
-- **Herança por célula mesclada**: Eixo Temático, Processo e Atividade herdam do último valor preenchido acima.
+- Fonte: export CSV do Google Sheets (UTF-8, separador `,`); o script auto-detecta delimitador e encoding.
+- **Colunas detectadas pelo nome no cabeçalho** (a planilha pode reordenar). Layout atual: Eixo Temático | Prioridade | Prazo | Processo | Atividade | Tarefa | Responsável | Status. Sem cabeçalho reconhecível, cai no layout posicional legado (Prioridade | Prazo | Eixo | …).
+- **Herança por célula mesclada**: Eixo Temático, Processo e Atividade herdam do último valor preenchido acima — respeitando a hierarquia: mudar de Eixo invalida Processo/Atividade herdados; mudar de Processo invalida Atividade. Responsável e Prioridade NÃO herdam.
 - **Defaults quando vazio**: Prioridade = "média", Status = "não iniciado"
-- Col 2 ("Prazo" genérico) é ignorada; Col 8 é o prazo da Tarefa.
-- **Progresso**: Não existe na planilha atual. Será coluna futura. Enquanto ausente, derivar do Status: `nao_iniciado` → 0%, `em_andamento` → 50%, `concluido` → 100%, `bloqueado`/`em_risco` → 25%.
-- **Estado atual dos dados**: O CSV disponível é um trecho preliminar (1 Eixo, 4 tarefas). A planilha completa terá múltiplos Eixos Temáticos.
+- Linha sem Atividade nem Tarefa mas com Processo: o Processo é a própria unidade de trabalho (vira tarefa com desc = Processo).
+- Linha só com Eixo (ex: eixo recém-criado): o eixo aparece no dashboard com 0 tarefas.
+- Prazos podem ser textuais ("3 meses", "Em aberto"); "Em aberto" vira vazio, datas são normalizadas para ISO, demais textos passam como estão.
+- **Progresso**: Não existe na planilha atual. Será coluna futura. Enquanto ausente, derivar do Status: `nao_iniciado` → 0%, `em_andamento` → 50%, `concluido` → 100%, `bloqueado`/`em_risco`/`stand by` → 25%.
+- **Estado atual dos dados**: 10 Eixos Temáticos, 34 tarefas (jun/2026).
 
 ## Público-alvo
 
