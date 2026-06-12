@@ -1,9 +1,9 @@
 name: Sync Google Sheets → acoes.json
 
 on:
-  # Todo dia às 8h (Brasília) = 11h UTC
+  # Todo dia às 6h (Brasília, UTC-3) = 9h UTC
   schedule:
-    - cron: "0 11 * * *"
+    - cron: "0 9 * * *"
   # A cada push na main (ignora mudanças só no JSON para evitar loop)
   push:
     branches: [main]
