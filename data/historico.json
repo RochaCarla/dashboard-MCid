@@ -5751,6 +5751,119 @@
           }
         }
       ]
+    },
+    {
+      "date": "2026-07-18",
+      "total_tarefas": 53,
+      "total_eixos": 10,
+      "progresso_medio": 17.9,
+      "por_status": {
+        "concluido": 3,
+        "nao_iniciado": 37,
+        "em_andamento": 13
+      },
+      "por_eixo": [
+        {
+          "id": 1,
+          "nome": "Financiamento",
+          "total": 4,
+          "progresso": 25.0,
+          "status": {
+            "concluido": 1,
+            "nao_iniciado": 3
+          }
+        },
+        {
+          "id": 2,
+          "nome": "Apoio às Construtoras PMEs",
+          "total": 5,
+          "progresso": 10.0,
+          "status": {
+            "nao_iniciado": 4,
+            "em_andamento": 1
+          }
+        },
+        {
+          "id": 3,
+          "nome": "Kits Industrializados e Off-Site Parks",
+          "total": 5,
+          "progresso": 30.0,
+          "status": {
+            "em_andamento": 3,
+            "nao_iniciado": 2
+          }
+        },
+        {
+          "id": 4,
+          "nome": "Equidade Regional (Programa Norte)",
+          "total": 4,
+          "progresso": 12.5,
+          "status": {
+            "nao_iniciado": 3,
+            "em_andamento": 1
+          }
+        },
+        {
+          "id": 5,
+          "nome": "Suporte à Inovação",
+          "total": 5,
+          "progresso": 10.0,
+          "status": {
+            "em_andamento": 1,
+            "nao_iniciado": 4
+          }
+        },
+        {
+          "id": 6,
+          "nome": "Padronização do Código de Obras",
+          "total": 11,
+          "progresso": 13.6,
+          "status": {
+            "em_andamento": 3,
+            "nao_iniciado": 8
+          }
+        },
+        {
+          "id": 7,
+          "nome": "Digitalização (BIM e Processos)",
+          "total": 6,
+          "progresso": 8.3,
+          "status": {
+            "em_andamento": 1,
+            "nao_iniciado": 5
+          }
+        },
+        {
+          "id": 8,
+          "nome": "Descarbonização da Construção",
+          "total": 9,
+          "progresso": 33.3,
+          "status": {
+            "concluido": 2,
+            "em_andamento": 2,
+            "nao_iniciado": 5
+          }
+        },
+        {
+          "id": 9,
+          "nome": "Financiamento Pró-Soluto",
+          "total": 3,
+          "progresso": 16.7,
+          "status": {
+            "nao_iniciado": 2,
+            "em_andamento": 1
+          }
+        },
+        {
+          "id": 10,
+          "nome": "Adequação do Risco de Crédito",
+          "total": 1,
+          "progresso": 0.0,
+          "status": {
+            "nao_iniciado": 1
+          }
+        }
+      ]
     }
   ]
 }
