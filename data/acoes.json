@@ -2,8 +2,8 @@
   "meta": {
     "titulo": "Painel de Gestão — GT Industrialização",
     "subtitulo": "Universidade de Brasília · Ministério das Cidades",
-    "atualizado_em": "2026-07-22",
-    "sincronizado_em": "2026-07-22T10:59:54Z",
+    "atualizado_em": "2026-07-23",
+    "sincronizado_em": "2026-07-23T11:01:55Z",
     "proxima_reuniao": "2026-06-18",
     "guardia": "Equipe CEAG",
     "schema": "v2"
@@ -223,12 +223,12 @@
       "meta": "",
       "processos": [
         {
-          "processo": "FINNIC",
+          "processo": "FNNIC",
           "tarefas": [
             {
               "id": 4015,
               "atividade": "",
-              "desc": "FINNIC",
+              "desc": "FNNIC",
               "resp": "",
               "status": "nao_iniciado",
               "prioridade": "media",
@@ -300,7 +300,7 @@
           "tarefas": [
             {
               "id": 5019,
-              "atividade": "Solicitar levantamento da EMBRAPII",
+              "atividade": "Solicitar levantamento dos laboratórios credenciados da EMBRAPII",
               "desc": "Articular reunião com EMBRAPII para verificar",
               "resp": "SNH + EMBRAPII + laboratórios",
               "status": "em_andamento",
@@ -716,56 +716,7 @@
       "objetivo": "",
       "atores": "",
       "meta": "",
-      "processos": [
-        {
-          "processo": "Identificação das fontes de financiamento para a industrialização da Região Norte, incluindo a aquisição financiada de formas de alumínio e a formação de cadeias produtivas",
-          "tarefas": [
-            {
-              "id": 9050,
-              "atividade": "Levantar dados sobre financiamento para a industrialização da Região Norte, com foco na aquisição de formas de alumínio e em cadeias produtivas",
-              "desc": "Elaborar documento com informações pertinentes sobre as fontes de financiamento para a industrialização da Região Norte",
-              "resp": "SNH",
-              "status": "nao_iniciado",
-              "prioridade": "media",
-              "progresso": 0,
-              "prazo": "",
-              "notas": ""
-            }
-          ]
-        },
-        {
-          "processo": "Apoio ao desenvolvimento de novos métodos de construção que viabilizem a industrialização da construção na Região Norte",
-          "tarefas": [
-            {
-              "id": 9051,
-              "atividade": "Elaborar estratégia de apoio ao desenvolvimento de novos métodos de construção na Região Norte",
-              "desc": "Agendar reunião com parceiros estratégicos com a pauta na região norte",
-              "resp": "CBIC + FINNIC + Sinduscon",
-              "status": "nao_iniciado",
-              "prioridade": "media",
-              "progresso": 0,
-              "prazo": "",
-              "notas": ""
-            }
-          ]
-        },
-        {
-          "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
-          "tarefas": [
-            {
-              "id": 9052,
-              "atividade": "Verificar andamento da atualização do SINAPI",
-              "desc": "Fazer contato com a CAIXA",
-              "resp": "CAIXA",
-              "status": "em_andamento",
-              "prioridade": "media",
-              "progresso": 50,
-              "prazo": "",
-              "notas": ""
-            }
-          ]
-        }
-      ]
+      "processos": []
     },
     {
       "id": 10,
@@ -773,24 +724,7 @@
       "objetivo": "",
       "atores": "",
       "meta": "",
-      "processos": [
-        {
-          "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
-          "tarefas": [
-            {
-              "id": 10053,
-              "atividade": "Verificar andamento da atualização do SINAPI",
-              "desc": "Fazer contato com a CAIXA",
-              "resp": "",
-              "status": "nao_iniciado",
-              "prioridade": "media",
-              "progresso": 0,
-              "prazo": "",
-              "notas": ""
-            }
-          ]
-        }
-      ]
+      "processos": []
     }
   ]
 }
