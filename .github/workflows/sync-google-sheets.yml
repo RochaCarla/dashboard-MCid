@@ -44,7 +44,7 @@ jobs:
         run: |
           python scripts/xlsx_to_json.py \
             --file /tmp/planilha.csv \
-            --titulo "Painel de Gestão — GT Industrialização" \
+            --titulo "Painel de Gestão" \
             --subtitulo "Universidade de Brasília · Ministério das Cidades" \
             --proxima-reuniao "2026-06-18" \
             --guardia "Equipe CEAG" \

@@ -516,7 +516,7 @@ def main():
     p.add_argument("--client-id")
     p.add_argument("--client-secret")
     p.add_argument("--out", default="data/acoes.json")
-    p.add_argument("--titulo",    default="Painel de Gestão — GT Industrialização")
+    p.add_argument("--titulo",    default="Painel de Gestão")
     p.add_argument("--subtitulo", default="Ministério das Cidades · Secretaria Nacional de Habitação")
     p.add_argument("--proxima-reuniao", default="",
                    help="data da próxima reunião do GT (YYYY-MM-DD); vazio oculta o campo")
