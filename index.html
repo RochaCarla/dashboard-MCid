@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Gestão — GT Cidades Inteligentes</title>
+<title>Painel de Gestão</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A34F3'/><text x='16' y='22' font-family='sans-serif' font-size='9' font-weight='bold' fill='white' text-anchor='middle'>GH</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -251,6 +251,108 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 .alert-card.a-bloq  .alert-reason{color:#EA580C;font-weight:700}
 .alert-card.a-risco .alert-reason{color:#B45309;font-weight:700}
 
+/* ── DEPENDÊNCIAS ── */
+.dep-section{margin-bottom:24px}
+.section-title.dep-title{border-bottom-color:var(--teal)}
+.section-sub{font-size:12px;color:var(--text-l);margin:-6px 0 14px;line-height:1.5}
+.dep-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.dep-kpi{background:var(--card);border-radius:var(--rs);padding:12px 14px;border:1px solid var(--border);
+  border-left:4px solid var(--border)}
+.dep-kpi.k-trava{border-left-color:var(--err)}
+.dep-kpi.k-livre{border-left-color:var(--ok)}
+.dep-kpi.k-link {border-left-color:var(--teal)}
+.dep-kpi.k-chain{border-left-color:var(--primary)}
+.dep-kpi.k-neck {border-left-color:var(--warn)}
+.dep-kpi-lbl{font-size:10px;color:var(--text-l);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.dep-kpi-val{font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin-top:3px}
+.dep-kpi-det{font-size:10.5px;color:var(--text-m);margin-top:3px;line-height:1.35}
+
+.dep-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.dep-legend{display:flex;gap:14px;flex-wrap:wrap;margin-left:auto;font-size:11px;color:var(--text-l);
+  align-items:center}
+.dep-legend .li{display:flex;align-items:center;gap:5px}
+.dep-legend .swatch{width:22px;height:0;border-top-width:2px;border-top-style:solid;display:inline-block}
+.dep-legend .chip{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.dep-canvas{background:var(--card);border-radius:var(--r);border:1px solid var(--border);
+  box-shadow:var(--sh-sm);padding:14px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
+.dep-canvas svg{display:block}
+.dep-node{cursor:pointer}
+.dep-node .box{fill:#fff;stroke:var(--border);stroke-width:1}
+.dep-node.dim{opacity:.18}
+.dep-node.hot .box{stroke:var(--primary);stroke-width:2}
+.dep-edge{fill:none;stroke-width:2}
+.dep-edge.dim{opacity:.1}
+.dep-lane-lbl{font-size:10px;fill:var(--text-m);font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.dep-tooltip{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;font-size:11.5px;pointer-events:none;box-shadow:var(--sh-md);z-index:60;
+  opacity:0;transition:opacity .12s;max-width:280px;line-height:1.5}
+.dep-tooltip b{color:var(--navy)}
+
+/* alternador de visualização rede ↔ gantt */
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--border);
+  border-radius:22px;padding:3px;gap:2px}
+.seg-btn{border:none;background:transparent;padding:7px 16px;border-radius:18px;font-size:12px;
+  font-weight:600;color:var(--text-l);cursor:pointer;font-family:inherit;transition:var(--tr);
+  white-space:nowrap}
+.seg-btn:hover{color:var(--primary)}
+.seg-btn.active{background:var(--primary);color:#fff;box-shadow:var(--sh-sm)}
+
+/* ── GANTT ── */
+.gantt-wrap{display:flex;align-items:flex-start;background:var(--card);border-radius:var(--r);
+  border:1px solid var(--border);box-shadow:var(--sh-sm);overflow:hidden}
+/* min-width:0 + overflow:hidden são obrigatórios: sem eles o `nowrap` das
+   descrições vira o min-content do flex item e a coluna estoura a largura */
+.gantt-labels{flex:0 0 272px;min-width:0;overflow:hidden;
+  border-right:1px solid var(--border);background:#FCFCFE}
+.gantt-scroll{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative;min-width:0}
+.g-head{height:38px;display:flex;align-items:flex-end;padding:0 12px 9px;font-size:10px;
+  color:var(--text-m);font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  border-bottom:1px solid var(--border)}
+.g-row{height:30px;display:flex;align-items:center;gap:7px;padding:0 12px;cursor:pointer;
+  border-bottom:1px solid #F4F5F8;font-size:11.5px;transition:background .15s}
+.g-row:last-child{border-bottom:none}
+.g-row:hover{background:rgba(122,52,243,.05)}
+.g-row.dim{opacity:.32}
+.g-row.hot{background:rgba(122,52,243,.10)}
+.g-row .cod-chip{flex-shrink:0;font-size:10px}
+.g-desc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);min-width:0}
+.g-sep{grid-column:1/-1;height:0;border-top:1px dashed var(--border)}
+.gantt-nota{font-size:10.5px;color:var(--text-m);margin-top:8px;line-height:1.5;
+  padding-left:2px;font-style:italic}
+.gantt-nota b{color:var(--text-l);font-style:normal}
+.dep-legend .hatch{width:14px;height:11px;border-radius:2px;display:inline-block;
+  border:1px dashed #9CA3AF;
+  background:repeating-linear-gradient(45deg,#E5E7EB 0 3px,transparent 3px 6px)}
+
+/* gargalos */
+.neck-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:16px}
+.neck-card{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid var(--warn);
+  border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:var(--tr)}
+.neck-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.neck-card.crit{background:#FEF2F2;border-color:#FECACA;border-left-color:var(--err)}
+.neck-cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;
+  color:var(--primary);background:var(--info-bg);padding:1px 6px;border-radius:4px}
+.neck-desc{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.35;margin-top:6px}
+.neck-meta{font-size:11px;color:var(--text-m);margin-top:5px;line-height:1.45}
+.neck-meta strong{color:var(--warn-d,#B45309)}
+
+/* chips de código / dependência nas tabelas */
+.cod-chip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;font-weight:700;
+  color:var(--primary);background:var(--info-bg);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.dep-chip{display:inline-flex;align-items:center;gap:3px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;margin:1px 2px 1px 0;
+  cursor:pointer;border:1px solid transparent}
+.dep-chip.ok  {background:var(--ok-bg);color:var(--ok);border-color:#A7F3D0}
+.dep-chip.wait{background:var(--err-bg);color:var(--err);border-color:#FECACA}
+.dep-chip:hover{filter:brightness(.94)}
+.lock-tag{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;
+  padding:1px 6px;border-radius:9px;margin-left:5px;vertical-align:middle;white-space:nowrap}
+.lock-tag.travada {background:var(--err-bg);color:var(--err)}
+.lock-tag.liberada{background:var(--ok-bg);color:var(--ok)}
+tr.row-travada{background:rgba(239,68,68,.035)}
+tr.row-hl{background:rgba(122,52,243,.10) !important;transition:background .3s}
+
 /* ── RESPONSIVE: Mobile < 640px ── */
 @media(max-width:639px){
   .hdr-top{padding:8px 12px}
@@ -289,6 +391,20 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   .viz-section{margin-top:16px}
   .viz-card{padding:14px 16px}
   .viz-kpi-val{font-size:20px}
+  .dep-kpis{grid-template-columns:repeat(2,1fr);gap:10px}
+  .dep-kpi-val{font-size:18px}
+  .dep-toolbar{overflow-x:auto;flex-wrap:nowrap;gap:6px;padding-bottom:4px;
+    -webkit-overflow-scrolling:touch}
+  .dep-toolbar .filt{flex-shrink:0}
+  .dep-legend{display:none}
+  .dep-canvas{padding:10px}
+  .neck-grid{grid-template-columns:1fr}
+  .gantt-labels{flex:0 0 148px}
+  .g-row{padding:0 7px;gap:5px;font-size:10.5px}
+  .g-row .cod-chip{font-size:9px;padding:1px 4px}
+  .g-head{padding:0 7px 9px}
+  .seg-btn{padding:7px 12px;font-size:11px}
+  .gantt-nota{font-size:10px}
 }
 
 /* ── RESPONSIVE: Tablet 640–1023px ── */
@@ -307,6 +423,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   .search-box input{width:180px}
   .footer-inner{grid-template-columns:1fr;gap:28px}
   .footer-inst{padding:30px 20px 0}
+  .dep-legend{margin-left:0;width:100%;font-size:10.5px;gap:10px}
+  .dep-kpis{grid-template-columns:repeat(3,1fr)}
+  .gantt-labels{flex:0 0 210px}
 }
 
 /* ── Touch targets ── */
@@ -347,7 +466,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
         </a>
         <div class="logo-sep"></div>
         <a href="https://www.gov.br/cidades" target="_blank" class="logo-item">
-          <div class="logo-mark mcid">MCid</div>
+          <div class="logo-mark mcid">MCID</div>
           <div class="logo-text">Ministério das Cidades</div>
         </a>
         <div class="logo-sep"></div>
@@ -405,6 +524,46 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   <div class="alert-section" id="alertSection" style="display:none">
     <h2 class="section-title alert-title">⚠ Alertas — ações bloqueadas ou com prazo vencido</h2>
     <div class="alert-grid" id="alertGrid"></div>
+  </div>
+
+  <!-- REDE DE DEPENDÊNCIAS -->
+  <div class="dep-section" id="depSection" style="display:none">
+    <h2 class="section-title dep-title">🔗 Rede de dependências das entregas</h2>
+    <p class="section-sub" id="depSub"></p>
+
+    <div class="dep-kpis" id="depKpis"></div>
+
+    <div class="dep-toolbar">
+      <div class="seg">
+        <button class="seg-btn active" id="segRede"  onclick="setDepMode('rede')">🕸 Rede de pré-requisitos</button>
+        <button class="seg-btn"        id="segGantt" onclick="setDepMode('gantt')">📅 Linha do tempo (Gantt)</button>
+      </div>
+    </div>
+
+    <div class="dep-toolbar">
+      <button class="filt active" id="depBtnAll"   onclick="setDepView('todas')">Todas as cadeias</button>
+      <button class="filt"        id="depBtnBlock" onclick="setDepView('travadas')">Só com bloqueio</button>
+      <button class="filt"        id="depBtnFree"  onclick="setDepView('liberadas')">🚦 Prontas para iniciar</button>
+      <div class="dep-legend" id="depLegend"></div>
+    </div>
+
+    <div class="dep-canvas" id="depCanvas">
+      <svg id="depSvg"></svg>
+      <div class="dep-tooltip" id="depTooltip"></div>
+    </div>
+
+    <div id="ganttBox" style="display:none">
+      <div class="gantt-wrap">
+        <div class="gantt-labels" id="ganttLabels"></div>
+        <div class="gantt-scroll" id="ganttScroll">
+          <svg id="ganttSvg"></svg>
+          <div class="dep-tooltip" id="ganttTooltip"></div>
+        </div>
+      </div>
+      <div class="gantt-nota" id="ganttNota"></div>
+    </div>
+
+    <div class="neck-grid" id="neckGrid"></div>
   </div>
 
   <!-- SÉRIE HISTÓRICA -->
@@ -508,8 +667,10 @@ function isOverdue(acao) {
 // ── filtro (trabalha em lista plana de tarefas) ───────────────────────────────
 function filterAcoes(acoes) {
   let f = acoes;
-  if (currentFilter === "alta")       f = f.filter(a => a.prioridade === "alta");
-  else if (currentFilter !== "todos") f = f.filter(a => a.status === currentFilter);
+  if (currentFilter === "alta")          f = f.filter(a => a.prioridade === "alta");
+  else if (currentFilter === "travada")  f = f.filter(a => depState(a) === "travada");
+  else if (currentFilter === "liberada") f = f.filter(a => depState(a) === "liberada");
+  else if (currentFilter !== "todos")    f = f.filter(a => a.status === currentFilter);
   if (currentSearch) {
     const q = currentSearch.toLowerCase();
     f = f.filter(a =>
@@ -517,6 +678,8 @@ function filterAcoes(acoes) {
       (a.resp||"").toLowerCase().includes(q) ||
       (a.atividade||"").toLowerCase().includes(q) ||
       (a.processo||"").toLowerCase().includes(q) ||
+      (a.cod||"").toLowerCase().includes(q) ||
+      (a.depende_de||[]).join(" ").toLowerCase().includes(q) ||
       (a.notas||"").toLowerCase().includes(q)
     );
   }
@@ -525,11 +688,13 @@ function filterAcoes(acoes) {
 
 // ── render principal ──────────────────────────────────────────────────────────
 function render() {
+  buildDepGraph();     // grafo primeiro — filtros, tabelas e KPIs consultam DEP
   renderKPIs();
   renderDonut();
   renderBars();
   renderAtualizacao();
   renderAlertas();
+  renderDependencias();
   renderFilterBar();
   renderLinhas();
 }
@@ -586,6 +751,832 @@ function goToLinha(id) {
   if (el) { el.classList.add("open"); el.scrollIntoView({behavior:"smooth", block:"center"}); }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  REDE DE DEPENDÊNCIAS  —  Cod_Task ⇢ Depende de
+// ═══════════════════════════════════════════════════════════════════════════
+let DEP = null;            // grafo montado a partir das tarefas
+let depView = "todas";     // todas | travadas | liberadas
+let depMode = "rede";      // rede (grafo em camadas) | gantt (linha do tempo)
+
+// ── monta o grafo (nós = tarefas com código, arestas = pré-requisitos) ──────
+function buildDepGraph() {
+  const byCod = new Map();
+  allAcoes().forEach(t => { if (t.cod && !byCod.has(t.cod)) byCod.set(t.cod, t); });
+
+  const preds = new Map(), succ = new Map();
+  byCod.forEach((_, c) => { preds.set(c, []); succ.set(c, []); });
+
+  let vinculos = 0;
+  byCod.forEach((t, cod) => {
+    (t.depende_de || []).forEach(d => {
+      if (d === cod || !byCod.has(d) || preds.get(cod).includes(d)) return;
+      preds.get(cod).push(d);
+      succ.get(d).push(cod);
+      vinculos++;
+    });
+  });
+
+  // profundidade = maior caminho até uma raiz (com trava anti-ciclo)
+  const depth = new Map();
+  const calcDepth = (cod, guard) => {
+    if (depth.has(cod)) return depth.get(cod);
+    if (guard.has(cod)) return 0;
+    guard.add(cod);
+    const ps = preds.get(cod);
+    const d = ps.length ? Math.max(...ps.map(p => calcDepth(p, guard) + 1)) : 0;
+    guard.delete(cod);
+    depth.set(cod, d);
+    return d;
+  };
+  byCod.forEach((_, c) => calcDepth(c, new Set()));
+
+  // componentes conexos (grafo tratado como não-dirigido)
+  const compOf = new Map();
+  let nComp = 0;
+  byCod.forEach((_, c) => {
+    if (compOf.has(c)) return;
+    const fila = [c]; compOf.set(c, nComp);
+    while (fila.length) {
+      const n = fila.pop();
+      [...preds.get(n), ...succ.get(n)].forEach(v => {
+        if (!compOf.has(v)) { compOf.set(v, nComp); fila.push(v); }
+      });
+    }
+    nComp++;
+  });
+
+  DEP = { byCod, preds, succ, depth, compOf, vinculos, nComp };
+  return DEP;
+}
+
+// ── situação de uma tarefa perante seus pré-requisitos ─────────────────────
+//  livre     → não depende de ninguém
+//  travada   → algum predecessor ainda não concluído
+//  liberada  → todos os predecessores concluídos, tarefa ainda aberta
+//  concluida → a própria tarefa já foi concluída
+function depState(t) {
+  if (!DEP || !t) return "livre";
+  const deps = (t.depende_de || []).filter(d => DEP.byCod.has(d));
+  if (!deps.length) return "livre";
+  if (t.status === "concluido") return "concluida";
+  const pendente = deps.some(d => DEP.byCod.get(d).status !== "concluido");
+  return pendente ? "travada" : "liberada";
+}
+
+// tarefas que dependem desta, direta ou indiretamente
+function descendentes(cod, vistos = new Set()) {
+  (DEP.succ.get(cod) || []).forEach(s => {
+    if (!vistos.has(s)) { vistos.add(s); descendentes(s, vistos); }
+  });
+  return vistos;
+}
+function ancestrais(cod, vistos = new Set()) {
+  (DEP.preds.get(cod) || []).forEach(p => {
+    if (!vistos.has(p)) { vistos.add(p); ancestrais(p, vistos); }
+  });
+  return vistos;
+}
+
+// ── quais cadeias mostrar no modo atual ────────────────────────────────────
+function depCodsVisiveis() {
+  // só entram tarefas que participam de alguma cadeia (têm pré ou pós)
+  const naCadeia = [...DEP.byCod.keys()].filter(
+    c => DEP.preds.get(c).length || DEP.succ.get(c).length);
+  if (depView === "todas") return naCadeia;
+
+  const alvo = naCadeia.filter(c => depState(DEP.byCod.get(c)) ===
+    (depView === "travadas" ? "travada" : "liberada"));
+  // mantém a cadeia inteira de cada tarefa-alvo para dar contexto
+  const manter = new Set();
+  alvo.forEach(c => {
+    manter.add(c);
+    ancestrais(c).forEach(x => manter.add(x));
+    descendentes(c).forEach(x => manter.add(x));
+  });
+  return naCadeia.filter(c => manter.has(c));
+}
+
+function setDepView(v) {
+  depView = v;
+  document.getElementById("depBtnAll").classList.toggle("active",   v === "todas");
+  document.getElementById("depBtnBlock").classList.toggle("active", v === "travadas");
+  document.getElementById("depBtnFree").classList.toggle("active",  v === "liberadas");
+  renderDepVis();
+}
+
+function setDepMode(m) {
+  depMode = m;
+  document.getElementById("segRede").classList.toggle("active",  m === "rede");
+  document.getElementById("segGantt").classList.toggle("active", m === "gantt");
+  document.getElementById("depCanvas").style.display = m === "rede"  ? "" : "none";
+  document.getElementById("ganttBox").style.display  = m === "gantt" ? "" : "none";
+  renderDepLegend();
+  renderDepVis();
+}
+
+function renderDepVis() {
+  if (depMode === "rede") renderDepGraph(); else renderGantt();
+}
+
+function renderDepLegend() {
+  document.getElementById("depLegend").innerHTML = depMode === "rede" ? `
+      <span class="li"><span class="swatch" style="border-top-color:#10B981"></span>pré-requisito cumprido</span>
+      <span class="li"><span class="swatch" style="border-top-color:#EF4444;border-top-style:dashed"></span>aguardando predecessor</span>
+      <span class="li"><span class="chip" style="background:#10B981"></span>concluído</span>
+      <span class="li"><span class="chip" style="background:#7A34F3"></span>em andamento</span>
+      <span class="li"><span class="chip" style="background:#9CA3AF"></span>não iniciado</span>`
+    : `
+      <span class="li"><span class="chip" style="background:#7A34F3"></span>prazo da planilha</span>
+      <span class="li"><span class="hatch"></span>janela estimada</span>
+      <span class="li"><span class="chip" style="background:#EF4444"></span>prazo vencido</span>
+      <span class="li"><span class="swatch" style="border-top-color:#EF4444;border-top-style:dashed"></span>dependência</span>`;
+}
+
+// ── seção completa ─────────────────────────────────────────────────────────
+function renderDependencias() {
+  const sec = document.getElementById("depSection");
+  if (!DEP.vinculos) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  renderDepResumo();
+  renderDepLegend();
+  renderDepVis();
+  renderGargalos();
+}
+
+function renderDepResumo() {
+  const todas    = allAcoes();
+  const naCadeia = [...DEP.byCod.keys()].filter(
+    c => DEP.preds.get(c).length || DEP.succ.get(c).length);
+  const travadas = todas.filter(t => depState(t) === "travada");
+  const liberadas= todas.filter(t => depState(t) === "liberada");
+  const maiorCadeia = Math.max(0, ...[...DEP.depth.values()]) + 1;
+
+  // gargalo: tarefa aberta que segura o maior número de entregas
+  const gargalos = naCadeia
+    .map(c => ({ cod: c, t: DEP.byCod.get(c), n: descendentes(c).size }))
+    .filter(g => g.n > 0 && g.t.status !== "concluido")
+    .sort((a, b) => b.n - a.n);
+  const top = gargalos[0];
+
+  document.getElementById("depSub").innerHTML =
+    `<strong>${naCadeia.length}</strong> das ${todas.length} entregas estão encadeadas em ` +
+    `<strong>${DEP.nComp - (DEP.byCod.size - naCadeia.length)}</strong> cadeias de pré-requisitos. ` +
+    `Cada seta liga uma entrega ao que precisa acontecer antes dela — ` +
+    `<span style="color:var(--err);font-weight:600">setas vermelhas tracejadas</span> apontam onde o fluxo está parado.`;
+
+  document.getElementById("depKpis").innerHTML = [
+    { c:"k-link",  lbl:"Vínculos mapeados", val: DEP.vinculos,
+      det:`entre ${naCadeia.length} entregas encadeadas` },
+    { c:"k-trava", lbl:"Entregas travadas", val: travadas.length,
+      det:"aguardam um pré-requisito não concluído" },
+    { c:"k-livre", lbl:"Prontas para iniciar", val: liberadas.length,
+      det:"pré-requisitos cumpridos, execução liberada" },
+    { c:"k-chain", lbl:"Cadeia mais longa", val: maiorCadeia + (maiorCadeia === 1 ? " passo" : " passos"),
+      det:"maior sequência de entregas em série" },
+    { c:"k-neck",  lbl:"Principal gargalo", val: top ? top.cod : "–",
+      det: top ? `segura ${top.n} ${top.n === 1 ? "entrega" : "entregas"} · ${top.t.resp || "sem responsável"}`
+               : "nenhuma entrega travando outras" },
+  ].map(k => `
+    <div class="dep-kpi ${k.c}">
+      <div class="dep-kpi-lbl">${k.lbl}</div>
+      <div class="dep-kpi-val">${k.val}</div>
+      <div class="dep-kpi-det">${k.det}</div>
+    </div>`).join("");
+}
+
+// ── layout em camadas (Sugiyama simplificado): coluna = passo da cadeia ─────
+const DEP_NW = 208, DEP_NH = 72, DEP_GX = 62, DEP_GY = 16, DEP_TOP = 26;
+
+function layoutDep(cods) {
+  const set = new Set(cods);
+  // profundidade relativa ao subconjunto visível
+  const localDepth = new Map();
+  const calc = (c, guard) => {
+    if (localDepth.has(c)) return localDepth.get(c);
+    if (guard.has(c)) return 0;
+    guard.add(c);
+    const ps = DEP.preds.get(c).filter(p => set.has(p));
+    const d = ps.length ? Math.max(...ps.map(p => calc(p, guard) + 1)) : 0;
+    guard.delete(c);
+    localDepth.set(c, d);
+    return d;
+  };
+  cods.forEach(c => calc(c, new Set()));
+
+  // agrupa por componente conexo, ordenando pelas cadeias mais longas primeiro
+  const comps = new Map();
+  cods.forEach(c => {
+    const k = DEP.compOf.get(c);
+    if (!comps.has(k)) comps.set(k, []);
+    comps.get(k).push(c);
+  });
+  const ordenados = [...comps.values()].sort((a, b) => {
+    const prof = arr => Math.max(...arr.map(c => localDepth.get(c)));
+    return prof(b) - prof(a) || b.length - a.length ||
+           (a[0] < b[0] ? -1 : 1);
+  });
+
+  const pos = new Map();
+  let linhaBase = 0;
+  ordenados.forEach(comp => {
+    const porNivel = new Map();
+    comp.forEach(c => {
+      const n = localDepth.get(c);
+      if (!porNivel.has(n)) porNivel.set(n, []);
+      porNivel.get(n).push(c);
+    });
+    let maxRow = 0;
+    [...porNivel.keys()].sort((a, b) => a - b).forEach(nivel => {
+      const usadas = new Set();
+      // aproxima cada nó da média das linhas de seus predecessores
+      const alvo = c => {
+        const ps = DEP.preds.get(c).filter(p => pos.has(p));
+        if (!ps.length) return 0;
+        return ps.reduce((s, p) => s + pos.get(p).row, 0) / ps.length - linhaBase;
+      };
+      porNivel.get(nivel)
+        .sort((a, b) => alvo(a) - alvo(b) || (a < b ? -1 : 1))
+        .forEach(c => {
+          let r = Math.max(0, Math.round(alvo(c)));
+          while (usadas.has(r)) r++;
+          usadas.add(r);
+          pos.set(c, { col: nivel, row: linhaBase + r });
+          maxRow = Math.max(maxRow, r);
+        });
+    });
+    linhaBase += maxRow + 1;
+  });
+
+  const nCols = Math.max(1, ...[...pos.values()].map(p => p.col + 1));
+  return {
+    pos, nCols, nRows: linhaBase,
+    W: nCols * DEP_NW + (nCols - 1) * DEP_GX,
+    H: DEP_TOP + linhaBase * (DEP_NH + DEP_GY),
+  };
+}
+
+// quebra o texto do nó em no máximo `max` linhas
+function wrapDep(txt, chars, max) {
+  const palavras = (txt || "").split(/\s+/).filter(Boolean);
+  const linhas = [];
+  let atual = "";
+  palavras.forEach(p => {
+    if (!atual.length) atual = p;
+    else if ((atual + " " + p).length <= chars) atual += " " + p;
+    else { linhas.push(atual); atual = p; }
+  });
+  if (atual) linhas.push(atual);
+  if (linhas.length > max) {
+    linhas.length = max;
+    linhas[max - 1] = linhas[max - 1].slice(0, chars - 1).replace(/[\s,;.]+$/, "") + "…";
+  }
+  // palavra única maior que a largura do nó (URL, sigla longa): corta na força
+  return linhas.map(l => l.length > chars ? l.slice(0, chars - 1) + "…" : l);
+}
+
+function renderDepGraph() {
+  const cods = depCodsVisiveis();
+  const canvas = document.getElementById("depCanvas");
+  const svgEl  = d3.select("#depSvg");
+  svgEl.selectAll("*").remove();
+
+  if (!cods.length) {
+    svgEl.attr("width", 300).attr("height", 60).attr("viewBox", "0 0 300 60")
+      .append("text").attr("x", 8).attr("y", 32).attr("font-size", "12px")
+      .attr("fill", "#9CA3AF").attr("font-family", "Inter,sans-serif")
+      .text("Nenhuma cadeia neste recorte.");
+    return;
+  }
+
+  const L = layoutDep(cods);
+  const X = c => L.pos.get(c).col * (DEP_NW + DEP_GX);
+  const Y = c => DEP_TOP + L.pos.get(c).row * (DEP_NH + DEP_GY);
+
+  const svg = svgEl
+    .attr("width", L.W).attr("height", L.H)
+    .attr("viewBox", `0 0 ${L.W} ${L.H}`)
+    .style("min-width", L.W + "px");
+
+  // marcadores de seta
+  const defs = svg.append("defs");
+  [["arrOk", "#10B981"], ["arrWait", "#EF4444"]].forEach(([id, cor]) => {
+    defs.append("marker")
+      .attr("id", id).attr("viewBox", "0 0 10 10")
+      .attr("refX", 9).attr("refY", 5)
+      .attr("markerWidth", 5).attr("markerHeight", 5).attr("orient", "auto-start-reverse")
+      .append("path").attr("d", "M0,1 L9,5 L0,9 z").attr("fill", cor);
+  });
+
+  // rótulos de coluna (passo da cadeia)
+  for (let c = 0; c < L.nCols; c++) {
+    svg.append("text")
+      .attr("class", "dep-lane-lbl")
+      .attr("x", c * (DEP_NW + DEP_GX)).attr("y", 12)
+      .attr("font-family", "Inter,sans-serif")
+      .text(c === 0 ? "1º passo · sem pré-requisito" : `${c + 1}º passo`);
+  }
+
+  // arestas
+  const visiveis = new Set(cods);
+  const arestas = [];
+  cods.forEach(alvo => {
+    DEP.preds.get(alvo).filter(p => visiveis.has(p)).forEach(orig => {
+      arestas.push({ orig, alvo, ok: DEP.byCod.get(orig).status === "concluido" });
+    });
+  });
+
+  const gEdges = svg.append("g");
+  gEdges.selectAll("path").data(arestas).join("path")
+    .attr("class", d => `dep-edge e-${d.orig}-${d.alvo}`)
+    .attr("stroke", d => d.ok ? "#10B981" : "#EF4444")
+    .attr("stroke-dasharray", d => d.ok ? null : "5,4")
+    .attr("marker-end", d => `url(#${d.ok ? "arrOk" : "arrWait"})`)
+    .attr("d", d => {
+      const x1 = X(d.orig) + DEP_NW, y1 = Y(d.orig) + DEP_NH / 2;
+      const x2 = X(d.alvo) - 6,      y2 = Y(d.alvo) + DEP_NH / 2;
+      const dx = Math.max(24, (x2 - x1) * 0.5);
+      return `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+    });
+
+  // nós
+  const LOCK = { travada: "🔒", liberada: "🚦", concluida: "✓", livre: "" };
+  const gNodes = svg.append("g");
+  const nos = gNodes.selectAll("g").data(cods).join("g")
+    .attr("class", d => `dep-node n-${d}`)
+    .attr("transform", d => `translate(${X(d)},${Y(d)})`)
+    .on("click", (_, d) => goToTarefa(d))
+    .on("mousemove", (ev, d) => depHover(ev, d))
+    .on("mouseleave", depBlur);
+
+  nos.append("rect").attr("class", "box")
+    .attr("width", DEP_NW).attr("height", DEP_NH).attr("rx", 9);
+  // faixa de status à esquerda
+  nos.append("path")
+    .attr("d", `M0,9 A9,9 0 0 1 9,0 L5,0 L5,${DEP_NH} L9,${DEP_NH} A9,9 0 0 1 0,${DEP_NH - 9} Z`)
+    .attr("fill", d => STATUS[DEP.byCod.get(d).status]?.color || "#9CA3AF");
+  nos.append("rect")
+    .attr("x", 0).attr("y", 0).attr("width", 5).attr("height", DEP_NH)
+    .attr("fill", d => STATUS[DEP.byCod.get(d).status]?.color || "#9CA3AF");
+
+  // código + selo de situação
+  nos.append("text")
+    .attr("x", 13).attr("y", 16).attr("font-size", "10.5px").attr("font-weight", "700")
+    .attr("fill", "#7A34F3").attr("font-family", "ui-monospace,Menlo,monospace")
+    .text(d => d);
+  nos.append("text")
+    .attr("x", DEP_NW - 10).attr("y", 16).attr("text-anchor", "end")
+    .attr("font-size", "10px").attr("font-family", "Inter,sans-serif")
+    .attr("font-weight", "700")
+    .attr("fill", d => ({ travada:"#EF4444", liberada:"#10B981", concluida:"#10B981" })[depState(DEP.byCod.get(d))] || "#9CA3AF")
+    .text(d => {
+      const s = depState(DEP.byCod.get(d));
+      return s === "travada" ? "🔒 travada" : s === "liberada" ? "🚦 pronta"
+           : DEP.byCod.get(d).status === "concluido" ? "✓ concluída" : "";
+    });
+
+  // descrição (até 2 linhas)
+  nos.each(function (d) {
+    const t = DEP.byCod.get(d);
+    const g = d3.select(this);
+    wrapDep(t.desc, 32, 2).forEach((ln, i) => {
+      g.append("text").attr("x", 13).attr("y", 33 + i * 13)
+        .attr("font-size", "10.5px").attr("fill", "#1F2937")
+        .attr("font-family", "Inter,sans-serif").attr("font-weight", "500")
+        .text(ln);
+    });
+    g.append("text").attr("x", 13).attr("y", DEP_NH - 9)
+      .attr("font-size", "9.5px").attr("fill", "#9CA3AF")
+      .attr("font-family", "Inter,sans-serif")
+      .text((t.prazo ? "⏱ " + fmtDate(t.prazo) + " · " : "") +
+            (t.resp ? wrapDep(t.resp, t.prazo ? 24 : 36, 1)[0] : "sem responsável"));
+  });
+}
+
+// realce da cadeia sob o cursor
+function depHover(ev, cod) {
+  const foco = new Set([cod, ...ancestrais(cod), ...descendentes(cod)]);
+  d3.selectAll(".dep-node").classed("dim", d => !foco.has(d)).classed("hot", d => d === cod);
+  d3.selectAll(".dep-edge").classed("dim", function () {
+    const m = this.getAttribute("class").match(/e-(\S+)-(\S+)/);
+    return !(m && foco.has(m[1]) && foco.has(m[2]));
+  });
+
+  const t = DEP.byCod.get(cod);
+  const st = depState(t);
+  const pend = (t.depende_de || []).filter(d => DEP.byCod.has(d) && DEP.byCod.get(d).status !== "concluido");
+  const seguram = descendentes(cod).size;
+  const eixo = DATA.linhas.find(l => l.id === t.linhaId);
+
+  const tip = document.getElementById("depTooltip");
+  tip.innerHTML =
+    `<b>${cod}</b> · ${eixo ? eixo.nome : ""}<br>` +
+    `<b>${t.desc}</b><br>` +
+    `<span style="color:${STATUS[t.status]?.color}">● ${STATUS[t.status]?.label || t.status}</span>` +
+    ` · ${t.resp || "sem responsável"}` +
+    (t.prazo ? ` · prazo ${fmtDate(t.prazo)}` : "") +
+    (st === "travada"
+      ? `<br><span style="color:#EF4444;font-weight:600">🔒 aguardando ${pend.join(", ")}</span>`
+      : st === "liberada"
+      ? `<br><span style="color:#10B981;font-weight:600">🚦 pré-requisitos cumpridos — pode iniciar</span>` : "") +
+    (seguram ? `<br><span style="color:#B45309">⚠ destrava ${seguram} ${seguram === 1 ? "entrega" : "entregas"} adiante</span>` : "");
+
+  const canvas = document.getElementById("depCanvas");
+  const box = canvas.getBoundingClientRect();
+  let x = ev.clientX - box.left + canvas.scrollLeft + 14;
+  let y = ev.clientY - box.top + 12;
+  if (x + 290 > canvas.scrollLeft + box.width) x -= 310;
+  tip.style.left = x + "px";
+  tip.style.top  = y + "px";
+  tip.style.opacity = 1;
+}
+
+function depBlur() {
+  d3.selectAll(".dep-node").classed("dim", false).classed("hot", false);
+  d3.selectAll(".dep-edge").classed("dim", false);
+  document.getElementById("depTooltip").style.opacity = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  GANTT  —  as mesmas cadeias, agora no tempo
+//  A planilha só tem UM prazo por tarefa (às vezes textual, às vezes vazio).
+//  A janela de execução é derivada: início = quando os pré-requisitos liberam,
+//  fim = prazo da planilha quando existe, senão duração declarada, senão
+//  estimativa. O que é estimado aparece hachurado — não é compromisso do GT.
+// ═══════════════════════════════════════════════════════════════════════════
+const DIA = 86400000;
+const DUR_PADRAO = 30;   // dias assumidos quando a planilha não informa nada
+const MES_ABREV = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const MESES_PT = { janeiro:0, fevereiro:1, "março":2, marco:2, abril:3, maio:4, junho:5,
+                   julho:6, agosto:7, setembro:8, outubro:9, novembro:10, dezembro:11 };
+
+const addDias = (d, n) => new Date(d.getTime() + n * DIA);
+const isISO   = p => /^\d{4}-\d{2}-\d{2}$/.test(p || "");
+
+// "3 meses" → 90 dias · "6 semanas" → 42 · "45 dias" → 45
+function parseDuracao(prazo) {
+  const s = (prazo || "").toLowerCase();
+  let m = s.match(/(\d+)\s*(?:mês|mes|meses)/); if (m) return +m[1] * 30;
+  m = s.match(/(\d+)\s*semanas?/);              if (m) return +m[1] * 7;
+  m = s.match(/(\d+)\s*dias?/);                 if (m) return +m[1];
+  return null;
+}
+
+// "Agosto" → último dia de agosto (deste ano ou do próximo, o que vier antes)
+function parseMesTexto(prazo, ref) {
+  const s = (prazo || "").toLowerCase().trim();
+  if (!(s in MESES_PT)) return null;
+  const m = MESES_PT[s];
+  const ano = m < ref.getMonth() ? ref.getFullYear() + 1 : ref.getFullYear();
+  return new Date(ano, m + 1, 0);
+}
+
+function ganttBase() {
+  const s = DATA.meta?.sincronizado_em || DATA.meta?.atualizado_em;
+  const d = s ? new Date(s) : new Date();
+  const ok = isNaN(d) ? new Date() : d;
+  return new Date(ok.getFullYear(), ok.getMonth(), ok.getDate());
+}
+
+// passagem para frente: cada tarefa começa quando o último pré-requisito termina
+function buildAgenda(cods) {
+  const base = ganttBase();
+  const ordem = [...cods].sort((a, b) => DEP.depth.get(a) - DEP.depth.get(b));
+  const ag = new Map();
+
+  ordem.forEach(cod => {
+    const t = DEP.byCod.get(cod);
+    const fins = DEP.preds.get(cod).filter(p => ag.has(p)).map(p => ag.get(p).fim.getTime());
+    let inicio = new Date(Math.max(base.getTime(), ...fins));
+    let fim, origem, nota;
+
+    if (t.status === "concluido") {
+      // já entregue: não ocupa o futuro nem segura ninguém
+      fim = new Date(base); inicio = addDias(base, -18);
+      origem = "concluida"; nota = "entrega concluída";
+    } else {
+      const alvo = isISO(t.prazo) ? new Date(t.prazo + "T12:00:00")
+                                  : parseMesTexto(t.prazo, base);
+      const dur  = alvo ? null : parseDuracao(t.prazo);
+
+      if (alvo && alvo <= inicio) {
+        origem = "vencida";
+        inicio = new Date(Math.min(alvo.getTime(), base.getTime()));
+        fim    = new Date(Math.max(base.getTime(), addDias(inicio, 7).getTime()));
+        nota   = "prazo " + fmtDate(t.prazo) + " já passou";
+      } else if (alvo) {
+        origem = "planilha"; fim = alvo;
+        nota = "prazo da planilha: " + (isISO(t.prazo) ? fmtDate(t.prazo) : t.prazo);
+      } else if (dur) {
+        origem = "duracao"; fim = addDias(inicio, dur);
+        nota = "duração declarada: " + t.prazo;
+      } else {
+        origem = "estimada"; fim = addDias(inicio, DUR_PADRAO);
+        nota = "sem prazo na planilha — janela estimada de " + DUR_PADRAO + " dias";
+      }
+    }
+    ag.set(cod, { inicio, fim, origem, nota, t });
+  });
+  return { base, ag };
+}
+
+// linhas agrupadas por cadeia, cadeias ordenadas por quem começa antes
+function ganttGrupos(cods, ag) {
+  const comps = new Map();
+  cods.forEach(c => {
+    const k = DEP.compOf.get(c);
+    if (!comps.has(k)) comps.set(k, []);
+    comps.get(k).push(c);
+  });
+  const grupos = [...comps.values()].map(g =>
+    g.sort((a, b) => DEP.depth.get(a) - DEP.depth.get(b) || (a < b ? -1 : 1)));
+  grupos.sort((a, b) => ag.get(a[0]).inicio - ag.get(b[0]).inicio || (a[0] < b[0] ? -1 : 1));
+  return grupos;
+}
+
+const G_ROW = 30, G_AXIS = 38, G_BAR = 15;
+const G_COR = { concluida:"#10B981", vencida:"#EF4444", planilha:null, duracao:null, estimada:null };
+
+function renderGantt() {
+  const cods = depCodsVisiveis();
+  const labels = document.getElementById("ganttLabels");
+  const svgEl  = d3.select("#ganttSvg");
+  svgEl.selectAll("*").remove();
+
+  if (!cods.length) {
+    labels.innerHTML = `<div class="g-head">Entrega</div>`;
+    svgEl.attr("width", 320).attr("height", 60).attr("viewBox", "0 0 320 60")
+      .append("text").attr("x", 10).attr("y", 34).attr("font-size", "12px")
+      .attr("fill", "#9CA3AF").attr("font-family", "Inter,sans-serif")
+      .text("Nenhuma cadeia neste recorte.");
+    document.getElementById("ganttNota").innerHTML = "";
+    return;
+  }
+
+  const { base, ag } = buildAgenda(cods);
+  const grupos = ganttGrupos(cods, ag);
+  const linhas = grupos.flat();
+  const rowIdx = new Map(linhas.map((c, i) => [c, i]));
+  const primeiroDoGrupo = new Set(grupos.map(g => g[0]));
+
+  // ── coluna fixa de rótulos ──
+  labels.innerHTML = `<div class="g-head">Entrega</div>` + linhas.map(c => {
+    const t = DEP.byCod.get(c);
+    const novo = primeiroDoGrupo.has(c) && rowIdx.get(c) > 0;
+    return `<div class="g-row gl-${c}" onclick="goToTarefa('${c}')"
+              onmouseenter="ganttFoco('${c}')" onmouseleave="ganttBlur()"
+              style="${novo ? "border-top:1px dashed #D8DCE4" : ""}">
+              <span class="cod-chip">${c}</span>
+              <span class="g-desc" title="${t.desc.replace(/"/g, "&quot;")}">${t.desc}</span>
+            </div>`;
+  }).join("");
+
+  // ── escala de tempo (fechada em meses cheios, para o eixo bater com o grid) ──
+  const t0 = d3.timeMonth.floor(d3.min(linhas, c => ag.get(c).inicio));
+  const t1 = d3.timeMonth.offset(d3.timeMonth.floor(d3.max(linhas, c => ag.get(c).fim)), 1);
+  const box = document.getElementById("ganttScroll");
+  const PAD_R = 104;   // faixa reservada à direita para a etiqueta de prazo
+  const W = Math.max(box.clientWidth - 4, Math.ceil((t1 - t0) / DIA * 2.6) + PAD_R, 420);
+  const H = G_AXIS + linhas.length * G_ROW;
+  const xs = d3.scaleTime().domain([t0, t1]).range([8, W - PAD_R]);
+
+  const svg = svgEl.attr("width", W).attr("height", H)
+    .attr("viewBox", `0 0 ${W} ${H}`).style("min-width", W + "px");
+
+  const defs = svg.append("defs");
+  defs.append("pattern").attr("id", "gHatch").attr("width", 6).attr("height", 6)
+    .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)")
+    .append("rect").attr("width", 2.4).attr("height", 6).attr("fill", "#fff").attr("opacity", .38);
+  [["gArrOk", "#10B981"], ["gArrWait", "#EF4444"]].forEach(([id, cor]) => {
+    defs.append("marker").attr("id", id).attr("viewBox", "0 0 10 10")
+      .attr("refX", 9).attr("refY", 5).attr("markerWidth", 5).attr("markerHeight", 5)
+      .attr("orient", "auto-start-reverse")
+      .append("path").attr("d", "M0,1 L9,5 L0,9 z").attr("fill", cor);
+  });
+
+  // ── eixo de meses ──
+  const meses = d3.timeMonth.range(d3.timeMonth.floor(t0), d3.timeMonth.offset(t1, 1));
+  const gAxis = svg.append("g");
+  meses.forEach(m => {
+    const x = xs(m);
+    if (x < 0 || x > W) return;
+    gAxis.append("line").attr("x1", x).attr("x2", x).attr("y1", G_AXIS - 10).attr("y2", H)
+      .attr("stroke", "#EDF0F4").attr("stroke-width", 1);
+    gAxis.append("text").attr("x", x + 4).attr("y", G_AXIS - 16)
+      .attr("font-size", "10px").attr("font-weight", "600").attr("fill", "#9CA3AF")
+      .attr("font-family", "Inter,sans-serif")
+      .text(MES_ABREV[m.getMonth()] + "/" + String(m.getFullYear()).slice(2));
+  });
+  svg.append("line").attr("x1", 0).attr("x2", W)
+    .attr("y1", G_AXIS - 9).attr("y2", G_AXIS - 9).attr("stroke", "#E5E7EB");
+
+  // faixas alternadas + divisórias de cadeia
+  linhas.forEach((c, i) => {
+    const y = G_AXIS + i * G_ROW;
+    if (i % 2) svg.append("rect").attr("x", 0).attr("y", y).attr("width", W)
+      .attr("height", G_ROW).attr("fill", "#FAFBFD");
+    if (primeiroDoGrupo.has(c) && i > 0)
+      svg.append("line").attr("x1", 0).attr("x2", W).attr("y1", y).attr("y2", y)
+        .attr("stroke", "#D8DCE4").attr("stroke-dasharray", "4,3");
+  });
+
+  // ── linha do "hoje" ──
+  const xh = xs(base);
+  svg.append("line").attr("x1", xh).attr("x2", xh).attr("y1", G_AXIS - 12).attr("y2", H)
+    .attr("stroke", "#7A34F3").attr("stroke-width", 1.5).attr("stroke-dasharray", "4,3");
+  svg.append("text").attr("x", xh + 4).attr("y", G_AXIS - 26)
+    .attr("font-size", "9.5px").attr("font-weight", "700").attr("fill", "#7A34F3")
+    .attr("font-family", "Inter,sans-serif").text("hoje");
+
+  // ── setas de dependência ──
+  const visiveis = new Set(cods);
+  const arestas = [];
+  cods.forEach(alvo => DEP.preds.get(alvo).filter(p => visiveis.has(p)).forEach(orig =>
+    arestas.push({ orig, alvo, ok: DEP.byCod.get(orig).status === "concluido" })));
+
+  svg.append("g").selectAll("path").data(arestas).join("path")
+    .attr("class", d => `dep-edge e-${d.orig}-${d.alvo}`)
+    .attr("stroke", d => d.ok ? "#10B981" : "#EF4444")
+    .attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", d => d.ok ? null : "4,3")
+    .attr("marker-end", d => `url(#${d.ok ? "gArrOk" : "gArrWait"})`)
+    .attr("d", d => {
+      const y1 = G_AXIS + rowIdx.get(d.orig) * G_ROW + G_ROW / 2;
+      const y2 = G_AXIS + rowIdx.get(d.alvo) * G_ROW + G_ROW / 2;
+      const x1 = xs(ag.get(d.orig).fim);
+      const x2 = xs(ag.get(d.alvo).inicio);
+      if (x2 >= x1 + 15) return `M${x1},${y1} H${x1 + 7} V${y2} H${x2 - 4}`;
+      const ym = y2 - Math.sign(y2 - y1 || 1) * (G_ROW / 2);
+      return `M${x1},${y1} H${x1 + 7} V${ym} H${x2 - 9} V${y2} H${x2 - 4}`;
+    });
+
+  // ── barras ──
+  const gBars = svg.append("g");
+  linhas.forEach((c, i) => {
+    const a = ag.get(c), t = a.t;
+    const y = G_AXIS + i * G_ROW + (G_ROW - G_BAR) / 2;
+    const x = xs(a.inicio);
+    const w = Math.max(7, xs(a.fim) - x);
+    const cor = G_COR[a.origem] || STATUS[t.status]?.color || "#9CA3AF";
+    const estimada = a.origem === "estimada";
+
+    const g = gBars.append("g").attr("class", `dep-node n-${c}`)
+      .style("cursor", "pointer")
+      .on("click", () => goToTarefa(c))
+      .on("mousemove", ev => ganttHover(ev, c, a))
+      .on("mouseleave", ganttBlur);
+
+    g.append("rect")   // alvo de hover em toda a faixa (sem classe .box: o
+      .attr("x", 0).attr("y", G_AXIS + i * G_ROW)   // realce da rede desenharia
+      .attr("width", W).attr("height", G_ROW)       // uma borda de ponta a ponta
+      .attr("fill", "transparent");
+    g.append("rect").attr("x", x).attr("y", y).attr("width", w).attr("height", G_BAR)
+      .attr("rx", 4).attr("fill", cor).attr("opacity", .42)
+      .attr("stroke", cor).attr("stroke-width", 1)
+      .attr("stroke-dasharray", estimada ? "3,2" : null);
+    if (t.progresso > 0)
+      g.append("rect").attr("x", x).attr("y", y)
+        .attr("width", Math.max(3, w * t.progresso / 100)).attr("height", G_BAR)
+        .attr("rx", 4).attr("fill", cor);
+    if (estimada)
+      g.append("rect").attr("x", x).attr("y", y).attr("width", w).attr("height", G_BAR)
+        .attr("rx", 4).attr("fill", "url(#gHatch)");
+
+    // etiqueta à direita da barra
+    const st = depState(t);
+    const selo = st === "travada" ? "🔒 " : st === "liberada" ? "🚦 " : "";
+    const txt = selo + (a.origem === "concluida" ? "concluída"
+              : a.origem === "vencida" ? "⚠ vencido " + fmtDate(t.prazo)
+              : isISO(t.prazo) ? fmtDate(t.prazo)
+              : t.prazo ? t.prazo : "sem prazo");
+    g.append("text").attr("x", x + w + 7).attr("y", G_AXIS + i * G_ROW + G_ROW / 2 + 3.5)
+      .attr("font-size", "9.5px").attr("font-family", "Inter,sans-serif")
+      .attr("font-weight", a.origem === "vencida" ? "700" : "500")
+      .attr("fill", a.origem === "vencida" ? "#EF4444"
+                  : a.origem === "estimada" ? "#A3AAB6" : "#6B7280")
+      .text(txt);
+  });
+
+  // ── nota metodológica ──
+  const n = { planilha:0, duracao:0, estimada:0, vencida:0, concluida:0 };
+  linhas.forEach(c => n[ag.get(c).origem]++);
+  document.getElementById("ganttNota").innerHTML =
+    `Início de cada barra = quando os pré-requisitos liberam a entrega; fim = ` +
+    `<b>prazo da planilha</b> (${n.planilha + n.vencida}), <b>duração declarada</b> (${n.duracao}) ` +
+    `ou <b>estimativa de ${DUR_PADRAO} dias</b> (${n.estimada}, hachuradas). ` +
+    `Datas derivadas para leitura do encadeamento — não substituem o cronograma pactuado no GT.`;
+}
+
+function ganttFoco(cod) {
+  const foco = new Set([cod, ...ancestrais(cod), ...descendentes(cod)]);
+  d3.selectAll("#ganttSvg .dep-node").classed("dim", d => false);
+  document.querySelectorAll("#ganttSvg .dep-node").forEach(el => {
+    const c = (el.getAttribute("class").match(/n-(\S+)/) || [])[1];
+    el.classList.toggle("dim", !foco.has(c));
+    el.classList.toggle("hot", c === cod);
+  });
+  document.querySelectorAll("#ganttSvg .dep-edge").forEach(el => {
+    const m = el.getAttribute("class").match(/e-(\S+)-(\S+)/);
+    el.classList.toggle("dim", !(m && foco.has(m[1]) && foco.has(m[2])));
+  });
+  document.querySelectorAll("#ganttLabels .g-row").forEach(el => {
+    const c = (el.getAttribute("class").match(/gl-(\S+)/) || [])[1];
+    el.classList.toggle("dim", !foco.has(c));
+    el.classList.toggle("hot", c === cod);
+  });
+}
+
+function ganttHover(ev, cod, a) {
+  ganttFoco(cod);
+  const t = a.t, st = depState(t);
+  const pend = (t.depende_de || []).filter(d => DEP.byCod.has(d) && DEP.byCod.get(d).status !== "concluido");
+  const eixo = DATA.linhas.find(l => l.id === t.linhaId);
+  const dias = Math.max(1, Math.round((a.fim - a.inicio) / DIA));
+
+  const tip = document.getElementById("ganttTooltip");
+  tip.innerHTML =
+    `<b>${cod}</b> · ${eixo ? eixo.nome : ""}<br><b>${t.desc}</b><br>` +
+    `<span style="color:${STATUS[t.status]?.color}">● ${STATUS[t.status]?.label || t.status}</span>` +
+    ` · ${t.resp || "sem responsável"}<br>` +
+    `<span style="color:var(--text-m)">${fmtDataCurta(a.inicio)} → ${fmtDataCurta(a.fim)} · ${dias} dias</span><br>` +
+    `<span style="color:${a.origem === "estimada" ? "#B45309" : "var(--text-l)"}">${a.nota}</span>` +
+    (st === "travada" ? `<br><span style="color:#EF4444;font-weight:600">🔒 só começa depois de ${pend.join(", ")}</span>`
+     : st === "liberada" ? `<br><span style="color:#10B981;font-weight:600">🚦 pré-requisitos cumpridos</span>` : "");
+
+  const box = document.getElementById("ganttScroll");
+  const r = box.getBoundingClientRect();
+  let x = ev.clientX - r.left + box.scrollLeft + 14;
+  let y = ev.clientY - r.top + 12;
+  if (x - box.scrollLeft + 300 > r.width) x -= 314;
+  tip.style.left = Math.max(4, x) + "px";
+  tip.style.top  = y + "px";
+  tip.style.opacity = 1;
+}
+
+function ganttBlur() {
+  document.querySelectorAll("#ganttSvg .dep-node, #ganttSvg .dep-edge, #ganttLabels .g-row")
+    .forEach(el => el.classList.remove("dim", "hot"));
+  document.getElementById("ganttTooltip").style.opacity = 0;
+}
+
+function fmtDataCurta(d) {
+  return String(d.getDate()).padStart(2, "0") + "/" + MES_ABREV[d.getMonth()];
+}
+
+// ── gargalos: entregas abertas que seguram outras ──────────────────────────
+function renderGargalos() {
+  const eixoNome = {};
+  DATA.linhas.forEach(l => eixoNome[l.id] = l.nome);
+
+  const gargalos = [...DEP.byCod.keys()]
+    .map(c => ({ cod: c, t: DEP.byCod.get(c), n: descendentes(c).size }))
+    .filter(g => g.n > 0 && g.t.status !== "concluido")
+    .sort((a, b) => b.n - a.n || (a.cod < b.cod ? -1 : 1));
+
+  const grid = document.getElementById("neckGrid");
+  if (!gargalos.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      ✓ Nenhuma entrega aberta está segurando outras — todas as cadeias estão fluindo.</div>`;
+    return;
+  }
+
+  grid.innerHTML = `<h3 style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--navy);
+      text-transform:uppercase;letter-spacing:.4px;margin-top:4px">
+      ⚠ Gargalos — entregas em aberto que seguram o fluxo</h3>` +
+    gargalos.map(g => `
+      <div class="neck-card ${g.n > 1 ? "crit" : ""}" onclick="goToTarefa('${g.cod}')">
+        <span class="neck-cod">${g.cod}</span>
+        <span class="sb s-${g.t.status}" style="margin-left:6px">
+          <span class="sd"></span>${STATUS[g.t.status]?.label || g.t.status}</span>
+        <div class="neck-desc">${g.t.desc}</div>
+        <div class="neck-meta">
+          ${eixoNome[g.t.linhaId] || ""} · ${g.t.resp || "sem responsável"}
+          ${g.t.prazo ? " · prazo " + fmtDate(g.t.prazo) : ""}<br>
+          <strong>Destrava ${g.n} ${g.n === 1 ? "entrega" : "entregas"}:</strong>
+          ${[...descendentes(g.cod)].sort().join(", ")}
+        </div>
+      </div>`).join("");
+}
+
+// ── navegação por código de tarefa ─────────────────────────────────────────
+function goToTarefa(cod) {
+  const t = DEP.byCod.get(cod);
+  if (!t) return;
+  // limpa filtros que possam esconder a tarefa
+  if (currentFilter !== "todos" || currentSearch) {
+    currentFilter = "todos"; currentSearch = ""; render();
+  }
+  const card = document.getElementById(`linha-${t.linhaId}`);
+  if (card) card.classList.add("open");
+  const row = document.querySelector(`tr[data-cod="${cod}"]`);
+  const alvo = row || card;
+  if (alvo) alvo.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (row) {
+    document.querySelectorAll("tr.row-hl").forEach(r => r.classList.remove("row-hl"));
+    row.classList.add("row-hl");
+    setTimeout(() => row.classList.remove("row-hl"), 2600);
+  }
+}
+
 // ── KPIs ──────────────────────────────────────────────────────────────────────
 function renderKPIs() {
   const all = allAcoes();
@@ -600,13 +1591,21 @@ function renderKPIs() {
     return diff >= 0 && diff <= 30;
   }).length;
 
-  document.getElementById("kpiGrid").innerHTML = [
+  const travadas = all.filter(a => depState(a) === "travada").length;
+  const prontas  = all.filter(a => depState(a) === "liberada").length;
+
+  const cards = [
     {c:"c-navy", lbl:"Total de ações",     val: total, det:`em ${DATA.linhas.length} linhas`},
     {c:"c-teal", lbl:"Progresso geral",    val: avg+"%", det:"média de todas as ações"},
     {c:"c-ok",   lbl:"Concluídas",         val: done, det:`${total?Math.round(done/total*100):0}% do total`},
     {c:"c-gold", lbl:"Em andamento",       val: prog, det:`${total?Math.round(prog/total*100):0}% do total`},
     {c:"c-err",  lbl:"Bloqueadas / Risco", val: risk, det:`${soon} com prazo em 30 dias`},
-  ].map(k => `
+  ];
+  if (DEP?.vinculos) cards.push(
+    {c:"c-gold", lbl:"Travadas por dependência", val: travadas,
+     det:`${prontas} pronta${prontas === 1 ? "" : "s"} para iniciar`});
+
+  document.getElementById("kpiGrid").innerHTML = cards.map(k => `
     <div class="kpi ${k.c}">
       <div class="kpi-lbl">${k.lbl}</div>
       <div class="kpi-val">${k.val}</div>
@@ -734,6 +1733,8 @@ function renderFilterBar() {
     bloqueado:    all.filter(a=>a.status==="bloqueado").length,
     em_risco:     all.filter(a=>a.status==="em_risco").length,
     alta:         all.filter(a=>a.prioridade==="alta").length,
+    travada:      all.filter(a=>depState(a)==="travada").length,
+    liberada:     all.filter(a=>depState(a)==="liberada").length,
   };
   const defs = [
     {k:"todos",        lb:"Todos"},
@@ -743,9 +1744,12 @@ function renderFilterBar() {
     {k:"bloqueado",    lb:"Bloqueado"},
     {k:"em_risco",     lb:"Em risco"},
     {k:"alta",         lb:"⚡ Alta prioridade"},
+    // chips de dependência só aparecem quando a planilha mapeia pré-requisitos
+    {k:"travada",      lb:"🔒 Travada por dependência", dep:true},
+    {k:"liberada",     lb:"🚦 Pronta para iniciar",     dep:true},
   ];
   document.getElementById("filterBar").innerHTML = `
-    ${defs.map(d => `
+    ${defs.filter(d => !d.dep || DEP?.vinculos).map(d => `
       <button class="filt ${currentFilter===d.k?'active':''}" onclick="setFilter('${d.k}')">
         ${d.lb}<span class="cnt">${cnts[d.k]}</span>
       </button>`).join("")}
@@ -853,26 +1857,56 @@ function tabelaAcoes(filt) {
   </table>`;
 }
 
+// ── pré-requisitos de uma tarefa, como chips clicáveis ───────────────────────
+function depChips(t) {
+  const deps = (t.depende_de || []).filter(d => DEP?.byCod.has(d));
+  if (!deps.length) return "";
+  return `<div class="note" style="font-style:normal;margin-top:4px">
+    <span style="color:var(--text-m)">⟵ depende de</span>
+    ${deps.map(d => {
+      const p = DEP.byCod.get(d);
+      const ok = p.status === "concluido";
+      return `<span class="dep-chip ${ok ? "ok" : "wait"}"
+        onclick="event.stopPropagation();goToTarefa('${d}')"
+        title="${ok ? "Pré-requisito concluído" : "Aguardando: " + p.desc.replace(/"/g,"&quot;")}"
+        >${ok ? "✓" : "⏳"} ${d}</span>`;
+    }).join("")}
+  </div>`;
+}
+
+function lockTag(t) {
+  const s = depState(t);
+  if (s === "travada")  return `<span class="lock-tag travada" title="Um pré-requisito ainda não foi concluído">🔒 travada</span>`;
+  if (s === "liberada") return `<span class="lock-tag liberada" title="Todos os pré-requisitos concluídos">🚦 pronta</span>`;
+  return "";
+}
+
 // ── tabela v2 (mostra Atividade como sub-rótulo da Tarefa) ────────────────────
 function tabelaAcoesV2(tarefas) {
+  const temCod = tarefas.some(t => t.cod);
   return `
   <table class="tbl">
     <thead><tr>
-      <th style="width:15%">Atividade</th>
-      <th style="width:30%">Tarefa</th>
-      <th style="width:13%">Responsável</th>
-      <th style="width:10%">Prazo</th>
-      <th style="width:13%">Status</th>
+      ${temCod ? `<th style="width:6%">Cód.</th>` : ""}
+      <th style="width:14%">Atividade</th>
+      <th style="width:${temCod ? 27 : 30}%">Tarefa · pré-requisitos</th>
+      <th style="width:12%">Responsável</th>
+      <th style="width:9%">Prazo</th>
+      <th style="width:12%">Status</th>
       <th style="width:7%">Prior.</th>
       <th style="width:10%">Progresso</th>
     </tr></thead>
     <tbody>${tarefas.map(t => {
       const ov = isOverdue(t);
-      return `<tr>
+      const st = depState(t);
+      return `<tr data-cod="${t.cod||""}" class="${st === "travada" ? "row-travada" : ""}">
+        ${temCod ? `<td><span class="cod-chip">${t.cod||"–"}</span></td>` : ""}
         <td style="font-size:11px;color:var(--text-l);font-style:italic">${t.atividade||"–"}</td>
         <td>
           <span class="pri-dot p-${t.prioridade}"></span>
           <span style="${ov?'color:var(--err);font-weight:600':''}">${t.desc}</span>
+          ${lockTag(t)}
+          ${depChips(t)}
           ${t.notas ? `<div class="note">📌 ${t.notas}</div>` : ""}
         </td>
         <td style="color:var(--text-l)">${t.resp||"–"}</td>
@@ -925,13 +1959,16 @@ function setFilter(k) { currentFilter = k; render(); }
 function setSearch(v) { currentSearch = v; renderLinhas(); }
 
 function exportCSV() {
+  const SIT = { travada:"Travada", liberada:"Pronta para iniciar",
+                concluida:"Concluída", livre:"Sem dependência" };
   let csv = SCHEMA === "v2"
-    ? "Eixo;Processo;Atividade;Tarefa;Responsável;Prazo;Status;Prioridade;Progresso\n"
+    ? "Eixo;Processo;Atividade;Cod_Task;Tarefa;Depende de;Situação da dependência;Responsável;Prazo;Status;Prioridade;Progresso\n"
     : "Linha;Ação;Responsável;Prazo;Status;Prioridade;Progresso;Notas\n";
 
   if (SCHEMA === "v2") {
     DATA.linhas.forEach(l => l.processos.forEach(p => p.tarefas.forEach(t => {
-      csv += `"${l.id}. ${l.nome}";"${p.processo}";"${t.atividade||''}";"${t.desc}";` +
+      csv += `"${l.id}. ${l.nome}";"${p.processo}";"${t.atividade||''}";"${t.cod||''}";"${t.desc}";` +
+             `"${(t.depende_de||[]).join(', ')}";"${SIT[depState(t)]}";` +
              `"${t.resp}";"${fmtDate(t.prazo)}";"${STATUS[t.status]?.label||t.status}";` +
              `"${PRIORIDADE[t.prioridade]||t.prioridade}";"${t.progresso}%"\n`;
     })));
@@ -949,13 +1986,23 @@ function exportCSV() {
   a.click();
 }
 
-// redimensiona barras ao resize
-window.addEventListener("resize", () => { if(DATA) renderBars(); });
+// redimensiona barras e Gantt ao resize (o grafo em camadas tem largura fixa)
+window.addEventListener("resize", () => {
+  if (!DATA) return;
+  renderBars();
+  if (DEP?.vinculos && depMode === "gantt") renderGantt();
+});
+
+// Esc limpa o realce das visualizações de dependência
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape" || !DEP) return;
+  depBlur(); ganttBlur();
+});
 
 // ── dados de demonstração (fallback sem servidor) ─────────────────────────────
 const DEMO_DATA = {
   meta: {
-    titulo: "Painel de Gestão — GT Cidades Inteligentes (demo)",
+    titulo: "Painel de Gestão — GT Cidades Inteligentes",
     subtitulo: "Universidade de Brasília · Ministério das Cidades",
     atualizado_em: new Date().toISOString().slice(0,10)
   },

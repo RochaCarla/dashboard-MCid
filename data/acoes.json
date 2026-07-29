@@ -3,10 +3,16 @@
     "titulo": "Painel de Gestão — GT Industrialização",
     "subtitulo": "Universidade de Brasília · Ministério das Cidades",
     "atualizado_em": "2026-07-29",
-    "sincronizado_em": "2026-07-29T11:15:14Z",
+    "sincronizado_em": "2026-07-29T17:15:34Z",
     "proxima_reuniao": "2026-06-18",
     "guardia": "Equipe CEAG",
-    "schema": "v2"
+    "schema": "v2",
+    "dependencias": {
+      "vinculos": 16,
+      "bloqueadas": 15,
+      "orfas": 0,
+      "ciclos": 0
+    }
   },
   "linhas": [
     {
@@ -21,6 +27,7 @@
           "tarefas": [
             {
               "id": 1001,
+              "cod": "1.1.1",
               "atividade": "Tratar os dados do questionário sobre a demanda por Capital de Giro",
               "desc": "Analisar os dados dos questionários",
               "resp": "CEAG UnB",
@@ -28,10 +35,12 @@
               "prioridade": "media",
               "progresso": 100,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
               "id": 1002,
+              "cod": "1.1.2",
               "atividade": "Tratar os dados do questionário sobre a demanda por Capital de Giro",
               "desc": "Repassar ao BNDES as informações compiladas",
               "resp": "SNH",
@@ -39,10 +48,14 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "2026-08-09",
+              "depende_de": [
+                "1.1.1"
+              ],
               "notas": ""
             },
             {
               "id": 1003,
+              "cod": "1.2.1",
               "atividade": "Mapear parceiros para financiamento",
               "desc": "Mapear alternativas de parceiros de financiamento (bancos)",
               "resp": "SNH",
@@ -50,10 +63,12 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
               "id": 1004,
+              "cod": "1.3.1",
               "atividade": "Mobilizar parceiros para linhas de financiamento fabril",
               "desc": "Estruturar linhas de financiamento de Capital de Giro para a construção (bancos e agências de fomento)",
               "resp": "SNH",
@@ -61,6 +76,9 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "1.2.1"
+              ],
               "notas": ""
             }
           ]
@@ -79,6 +97,7 @@
           "tarefas": [
             {
               "id": 2005,
+              "cod": "1.4.1",
               "atividade": "Articular com CBIC para levantamento das possíveis interessadas",
               "desc": "Articular com CBIC para a próxima reunião do GT",
               "resp": "SNH + CBIC",
@@ -86,17 +105,7 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "",
-              "notas": ""
-            },
-            {
-              "id": 2006,
-              "atividade": "Articular com CBIC para levantamento das possíveis interessadas",
-              "desc": "Articular com CBIC para levantamento das possíveis interessadas",
-              "resp": "",
-              "status": "nao_iniciado",
-              "prioridade": "alta",
-              "progresso": 0,
-              "prazo": "2026-08-14",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -105,7 +114,8 @@
           "processo": "Elaboração de programa de parceria com o SENAI para capacitação",
           "tarefas": [
             {
-              "id": 2007,
+              "id": 2006,
+              "cod": "2.1.1",
               "atividade": "Construir agenda de elaboração da parceria",
               "desc": "Verificar proposta piloto elaborada pelo SENAI",
               "resp": "SNH + SENAI + MDIC + financiador",
@@ -113,10 +123,12 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 2008,
+              "id": 2007,
+              "cod": "2.2.1",
               "atividade": "Prospectar parcerias para piloto em 5 UFs",
               "desc": "Organizar encontros entre fabricantes e construtores (piloto 5 UFs)",
               "resp": "SNH + ABCIC",
@@ -124,10 +136,14 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "2.1.1"
+              ],
               "notas": ""
             },
             {
-              "id": 2009,
+              "id": 2008,
+              "cod": "2.3.1",
               "atividade": "Expandir encontros para todas as UFs",
               "desc": "Avaliar os programas pilotos",
               "resp": "SNH + CBIC",
@@ -135,6 +151,9 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "2.2.1"
+              ],
               "notas": ""
             }
           ]
@@ -152,7 +171,8 @@
           "processo": "Levantamento de documentação e experiências sobre off-site parks",
           "tarefas": [
             {
-              "id": 3010,
+              "id": 3009,
+              "cod": "3.1.1",
               "atividade": "Documentar modelo off-site park no Ceará para replicação",
               "desc": "Solicitar documentação do off-site park no Ceará para CBIC e ITIE",
               "resp": "SNH + CBIC + ITIE",
@@ -160,6 +180,7 @@
               "prioridade": "baixa",
               "progresso": 50,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -168,7 +189,8 @@
           "processo": "Articulação da estratégia de inovação com ABCIC a partir da Rede de Inovação",
           "tarefas": [
             {
-              "id": 3011,
+              "id": 3010,
+              "cod": "3.2.1",
               "atividade": "Identificar UFs prioritárias para novos off-site parks",
               "desc": "Elaborar lista de lugares para possíveis off-site parks",
               "resp": "",
@@ -176,10 +198,12 @@
               "prioridade": "baixa",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 3012,
+              "id": 3011,
+              "cod": "3.3.1",
               "atividade": "Levantar as necessidades dos associados",
               "desc": "Verificar dados já disponibilizados pela ABCIC",
               "resp": "ABCIC",
@@ -187,10 +211,12 @@
               "prioridade": "baixa",
               "progresso": 50,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 3013,
+              "id": 3012,
+              "cod": "3.4.1",
               "atividade": "Levantar necessidades das incorporadoras para elevar o grau de inovação no setor e das estratégias possíveis para suprir necessidades",
               "desc": "Elaborar proposta, a partir das incorporadoras, para aprimorar o processo de inovação associado ao DATec",
               "resp": "ABRAINC",
@@ -198,10 +224,12 @@
               "prioridade": "baixa",
               "progresso": 50,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 3014,
+              "id": 3013,
+              "cod": "3.5.1",
               "atividade": "Organizar e divulgar os mecanismos, processos e fontes de financiamento para a inovação disponibilizados pelo Governo Federal e acessíveis às empresas da cadeia produtiva da habitação PMEs",
               "desc": "Elaborar documento de mapeamento das fontes de financiamento para a inovação disponibilizados pelos Governo Federal acessíveis às empresas da cadeia produtiva da habitação PMEs",
               "resp": "SNH",
@@ -209,6 +237,9 @@
               "prioridade": "baixa",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "3.4.1"
+              ],
               "notas": ""
             }
           ]
@@ -226,7 +257,8 @@
           "processo": "FNNIC",
           "tarefas": [
             {
-              "id": 4015,
+              "id": 4014,
+              "cod": "4.1.1",
               "atividade": "",
               "desc": "FNNIC",
               "resp": "",
@@ -234,6 +266,7 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -242,7 +275,8 @@
           "processo": "Identificação das fontes de financiamento para a industrialização da Região Norte, incluindo a aquisição financiada de formas de alumínio e a formação de cadeias produtivas",
           "tarefas": [
             {
-              "id": 4016,
+              "id": 4015,
+              "cod": "4.2.1",
               "atividade": "Levantar dados sobre financiamento para a industrialização da Região Norte, com foco na aquisição de formas de alumínio e em cadeias produtivas",
               "desc": "Elaborar documento acerca dos financiamentos para a industrialização da Região Norte, com foco na aquisição de formas de alumínio e em cadeias produtivas",
               "resp": "SNH",
@@ -250,6 +284,7 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -258,7 +293,8 @@
           "processo": "Apoio ao desenvolvimento de novos métodos de construção que viabilizem a industrialização da construção na Região Norte",
           "tarefas": [
             {
-              "id": 4017,
+              "id": 4016,
+              "cod": "4.3.1",
               "atividade": "Elaborar estratégia de apoio ao desenvolvimento de novos métodos de construção na Região Norte",
               "desc": "Agendar reunião com parceiros estratégicos com a pauta na região norte",
               "resp": "CBIC + FINNIC + Sinduscon",
@@ -266,6 +302,9 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "4.2.1"
+              ],
               "notas": ""
             }
           ]
@@ -274,7 +313,8 @@
           "processo": "Aperfeiçoamento do SINAPI de modo a refletir adequadamente os custos de construção na Região Norte",
           "tarefas": [
             {
-              "id": 4018,
+              "id": 4017,
+              "cod": "4.4.1",
               "atividade": "Verificar andamento da atualização do SINAPI",
               "desc": "Fazer contato com a CAIXA",
               "resp": "Caixa",
@@ -282,6 +322,7 @@
               "prioridade": "media",
               "progresso": 50,
               "prazo": "2026-07-16",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -299,7 +340,8 @@
           "processo": "Verificação dos novos credenciamentos na EMBRAPII",
           "tarefas": [
             {
-              "id": 5019,
+              "id": 5018,
+              "cod": "5.1.1",
               "atividade": "Solicitar levantamento dos laboratórios credenciados da EMBRAPII",
               "desc": "Articular reunião com EMBRAPII para verificar",
               "resp": "SNH + EMBRAPII + laboratórios",
@@ -307,6 +349,7 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -315,7 +358,8 @@
           "processo": "Especialização dos laboratórios credenciados como instituições técnicas avaliadoras (PBQP-H)",
           "tarefas": [
             {
-              "id": 5020,
+              "id": 5019,
+              "cod": "5.2.1",
               "atividade": "Prospectar laboratórios que possam atuar como instituições técnicas avaliadoras do PBQP-H",
               "desc": "Agendar reunião com EMBRAPII, ITA e POLI-USP",
               "resp": "SNH + SENAI + universidades",
@@ -323,6 +367,9 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "5.1.1"
+              ],
               "notas": ""
             }
           ]
@@ -331,7 +378,8 @@
           "processo": "Oferta de pós-graduação na temática de inovação",
           "tarefas": [
             {
-              "id": 5021,
+              "id": 5020,
+              "cod": "5.3.1",
               "atividade": "Articular com Coordenação UnB",
               "desc": "Verificar agenda na próxima reunião de coordenação do TED",
               "resp": "SNH + UnB",
@@ -339,10 +387,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 5022,
+              "id": 5021,
+              "cod": "5.4.1",
               "atividade": "Fechamento do edital do mestrado profissional",
               "desc": "Fechamento do edital do mestrado profissional",
               "resp": "",
@@ -350,10 +400,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "2026-07-16",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 5023,
+              "id": 5022,
+              "cod": "5.4.2",
               "atividade": "Fechamento do edital do mestrado profissional",
               "desc": "Trâmites internos por parte da UnB para possibilitar o mestrado",
               "resp": "",
@@ -361,6 +413,9 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "Agosto",
+              "depende_de": [
+                "5.4.1"
+              ],
               "notas": ""
             }
           ]
@@ -378,7 +433,8 @@
           "processo": "Aprovação da Minuta de Padronização do Código de Obras",
           "tarefas": [
             {
-              "id": 6024,
+              "id": 6023,
+              "cod": "6.1.1",
               "atividade": "Elaborar minuta de referencial normativo",
               "desc": "Elaborar minuta de referencial normativo",
               "resp": "SNH",
@@ -386,10 +442,12 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6025,
+              "id": 6024,
+              "cod": "6.2.1",
               "atividade": "Apresentar minuta do referencial normativo ao GT",
               "desc": "Ajustar minuta do referencial normativo após encaminhamentos das entidades",
               "resp": "",
@@ -397,10 +455,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6026,
+              "id": 6025,
+              "cod": "6.3.1",
               "atividade": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
               "desc": "Demandar estudo de impacto",
               "resp": "",
@@ -408,10 +468,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6027,
+              "id": 6026,
+              "cod": "6.3.2",
               "atividade": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
               "desc": "Realizar estudo de impacto",
               "resp": "Caixa",
@@ -419,10 +481,14 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [
+                "6.3.1"
+              ],
               "notas": ""
             },
             {
-              "id": 6028,
+              "id": 6027,
+              "cod": "6.3.3",
               "atividade": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
               "desc": "Negociar com Conselheiros do CCFGTS",
               "resp": "",
@@ -430,21 +496,29 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "3 meses",
+              "depende_de": [
+                "6.3.2"
+              ],
               "notas": ""
             },
             {
-              "id": 6029,
-              "atividade": "Apresentar proposta de referencial normativo à alta gestão do MCid",
+              "id": 6028,
+              "cod": "6.4.1",
+              "atividade": "Apresentar proposta de referencial normativo à alta gestão do MCID",
               "desc": "Agendar reunião com alta gestão",
               "resp": "",
               "status": "em_andamento",
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "3 meses",
+              "depende_de": [
+                "6.2.1"
+              ],
               "notas": ""
             },
             {
-              "id": 6030,
+              "id": 6029,
+              "cod": "6.5.1",
               "atividade": "Publicar referencial normativo",
               "desc": "Publicar referencial normativo",
               "resp": "SNH",
@@ -452,6 +526,7 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -460,7 +535,8 @@
           "processo": "Estruturação da implementação do referencial normativo",
           "tarefas": [
             {
-              "id": 6031,
+              "id": 6030,
+              "cod": "6.6.1",
               "atividade": "Articular adesão de municípios",
               "desc": "Aprovar a proposta",
               "resp": "SNH + CCFGTS",
@@ -468,10 +544,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6032,
+              "id": 6031,
+              "cod": "6.6.2",
               "atividade": "Articular adesão de municípios",
               "desc": "Submeter minuta do referencial normativo à CONJUR",
               "resp": "SNH",
@@ -479,10 +557,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6033,
+              "id": 6032,
+              "cod": "6.6.3",
               "atividade": "Articular adesão de municípios",
               "desc": "Apresentar minuta do referencial normativo ao GT",
               "resp": "SNH",
@@ -490,10 +570,12 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 6034,
+              "id": 6033,
+              "cod": "6.6.4",
               "atividade": "Articular adesão de municípios",
               "desc": "Operacionalizar com a CAIXA",
               "resp": "SNH + GT",
@@ -501,6 +583,7 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "3 meses",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -518,7 +601,8 @@
           "processo": "Disseminação da estratégia BIM como metodologia obrigatória para projetos de construção do MCMV",
           "tarefas": [
             {
-              "id": 7035,
+              "id": 7034,
+              "cod": "7.1.1",
               "atividade": "Identificar correlação com Construa Brasil",
               "desc": "Elaborar estratégia de disseminação do BIM",
               "resp": "",
@@ -526,10 +610,12 @@
               "prioridade": "media",
               "progresso": 50,
               "prazo": "2026-08-09",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 7036,
+              "id": 7035,
+              "cod": "7.2.1",
               "atividade": "Mapear maturidade do setor da construção civil para a adoção do BIM como metodologia obrigatória",
               "desc": "Adaptar questionário já aplicado do setor público - MDIC",
               "resp": "",
@@ -537,10 +623,12 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 7037,
+              "id": 7036,
+              "cod": "7.2.2",
               "atividade": "Mapear maturidade do setor da construção civil para a adoção do BIM como metodologia obrigatória",
               "desc": "Receber e aprovar no GT",
               "resp": "",
@@ -548,10 +636,14 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "7.2.1"
+              ],
               "notas": ""
             },
             {
-              "id": 7038,
+              "id": 7037,
+              "cod": "7.2.3",
               "atividade": "Mapear maturidade do setor da construção civil para a adoção do BIM como metodologia obrigatória",
               "desc": "Aplicar o questionário - entidades do GT",
               "resp": "",
@@ -559,10 +651,14 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "7.2.2"
+              ],
               "notas": ""
             },
             {
-              "id": 7039,
+              "id": 7038,
+              "cod": "7.2.4",
               "atividade": "Mapear maturidade do setor da construção civil para a adoção do BIM como metodologia obrigatória",
               "desc": "Analisar dados do questionário",
               "resp": "",
@@ -570,10 +666,14 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [
+                "7.2.3"
+              ],
               "notas": ""
             },
             {
-              "id": 7040,
+              "id": 7039,
+              "cod": "7.3.1",
               "atividade": "Elaborar Plano de capacitação/conscientização de utilização do BIM por parte do Setor Privado ou de obrigatoriedade",
               "desc": "Elaborar Plano de capacitação/conscientização de utilização do BIM por parte do Setor Privado ou de obrigatoriedade",
               "resp": "",
@@ -581,6 +681,7 @@
               "prioridade": "media",
               "progresso": 0,
               "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -598,7 +699,8 @@
           "processo": "Operacionalização do ACT Rede de Inovação para Habitação Sustentável",
           "tarefas": [
             {
-              "id": 8041,
+              "id": 8040,
+              "cod": "8.1.1",
               "atividade": "Assinar ACT Rede",
               "desc": "Assinar ACT Rede",
               "resp": "SNH",
@@ -606,10 +708,12 @@
               "prioridade": "alta",
               "progresso": 100,
               "prazo": "2 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 8042,
+              "id": 8041,
+              "cod": "8.2.1",
               "atividade": "Realizar reunião do GT Sustentabilidade do PBQP-H",
               "desc": "Realizar reunião do GT Sustentabilidade do PBQP-H",
               "resp": "ABCLS",
@@ -617,10 +721,12 @@
               "prioridade": "alta",
               "progresso": 100,
               "prazo": "2 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 8043,
+              "id": 8042,
+              "cod": "8.2.2",
               "atividade": "Realizar reunião do GT Sustentabilidade do PBQP-H",
               "desc": "Elaboração do Plano de Trabalho da Rede",
               "resp": "ABCLS",
@@ -628,10 +734,12 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "2 meses",
+              "depende_de": [],
               "notas": ""
             },
             {
-              "id": 8044,
+              "id": 8043,
+              "cod": "8.3.1",
               "atividade": "Aprovar Plano de Trabalho",
               "desc": "Realizar reunião do GT Sustentabilidade do PBQP-H – 25/6",
               "resp": "",
@@ -639,10 +747,14 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "2 meses",
+              "depende_de": [
+                "8.2.2"
+              ],
               "notas": ""
             },
             {
-              "id": 8045,
+              "id": 8044,
+              "cod": "8.4.1",
               "atividade": "Implementar Plano de Trabalho",
               "desc": "Discutir a implementação do Plano de trabalho durante a reunião",
               "resp": "",
@@ -650,6 +762,9 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "2 meses",
+              "depende_de": [
+                "8.2.2"
+              ],
               "notas": ""
             }
           ]
@@ -658,7 +773,8 @@
           "processo": "Implementação das jornadas setoriais de baixo carbono via PSQs",
           "tarefas": [
             {
-              "id": 8046,
+              "id": 8045,
+              "cod": "8.5.1",
               "atividade": "Criar uma cartilha de incentivo à pesquisa aplicada de inovação sustentável para a construção",
               "desc": "Verificação das entidades",
               "resp": "",
@@ -666,28 +782,7 @@
               "prioridade": "alta",
               "progresso": 0,
               "prazo": "2 meses",
-              "notas": ""
-            },
-            {
-              "id": 8047,
-              "atividade": "Criar uma cartilha de incentivo à pesquisa aplicada de inovação sustentável para a construção",
-              "desc": "Criar uma cartilha de incentivo à pesquisa aplicada de inovação sustentável para a construção",
-              "resp": "",
-              "status": "nao_iniciado",
-              "prioridade": "media",
-              "progresso": 0,
-              "prazo": "",
-              "notas": ""
-            },
-            {
-              "id": 8048,
-              "atividade": "Criar uma cartilha de incentivo à pesquisa aplicada de inovação sustentável para a construção",
-              "desc": "Criar uma cartilha de incentivo à pesquisa aplicada de inovação sustentável para a construção",
-              "resp": "",
-              "status": "nao_iniciado",
-              "prioridade": "media",
-              "progresso": 0,
-              "prazo": "",
+              "depende_de": [],
               "notas": ""
             }
           ]
@@ -696,7 +791,8 @@
           "processo": "Estruturação da rede de laboratórios para inovação sustentável",
           "tarefas": [
             {
-              "id": 8049,
+              "id": 8046,
+              "cod": "8.6.1",
               "atividade": "Elaborar Plano de trabalho da Rede",
               "desc": "Verificar próxima reunião da Rede de Inovação",
               "resp": "",
@@ -704,6 +800,7 @@
               "prioridade": "alta",
               "progresso": 50,
               "prazo": "2 meses",
+              "depende_de": [],
               "notas": ""
             }
           ]

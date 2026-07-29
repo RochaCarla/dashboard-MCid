@@ -52,23 +52,29 @@ def detect_columns(header_row):
         prazos = [i for i, n in enumerate(names) if "prazo" in n]
         return {"prioridade": find("prioridade"), "eixo": eixo,
                 "processo": find("processo"), "atividade": find("atividade"),
-                "tarefa": find("tarefa"), "resp": find("respons"),
+                "cod": find("cod_task", "cod task", "código", "codigo", "cod"),
+                "tarefa": find("tarefa"), "depende": find("depende", "dependência", "dependencia"),
+                "resp": find("respons"),
                 "prazo": prazos[-1] if prazos else None, "status": find("status")}
 
     ncols = len(header_row)
     if ncols <= 8:
-        return {"prioridade": 0, "eixo": 2, "processo": 3,
-                "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 1, "status": 7}
+        return {"prioridade": 0, "eixo": 2, "processo": 3, "cod": None,
+                "atividade": 4, "tarefa": 5, "depende": None,
+                "resp": 6, "prazo": 1, "status": 7}
     else:
-        return {"prioridade": 0, "eixo": 2, "processo": 3,
-                "atividade": 4, "tarefa": 5, "resp": 6, "prazo": 7, "status": 8}
+        return {"prioridade": 0, "eixo": 2, "processo": 3, "cod": None,
+                "atividade": 4, "tarefa": 5, "depende": None,
+                "resp": 6, "prazo": 7, "status": 8}
 
 # defaults (overridden by detect_columns)
 COL_PRIORIDADE = 0
 COL_EIXO       = 2
 COL_PROCESSO   = 3
 COL_ATIVIDADE  = 4
+COL_COD        = None
 COL_TAREFA     = 5
+COL_DEPENDE    = None
 COL_RESP       = 6
 COL_PRAZO      = 7
 COL_STATUS     = 8
@@ -103,8 +109,15 @@ PRIO_MAP = {
     "":      "media",
 }
 
+# siglas institucionais grafadas de forma inconsistente na planilha; normalizadas
+# aqui para o dashboard não exibir "MCid" e "MCID" na mesma tela
+SIGLAS = [(re.compile(r"\bmcid\b", re.IGNORECASE), "MCID")]
+
 def norm(v) -> str:
-    return re.sub(r"\s+", " ", str(v or "").strip())
+    s = re.sub(r"\s+", " ", str(v or "").strip())
+    for rx, sigla in SIGLAS:
+        s = rx.sub(sigla, s)
+    return s
 
 def parse_status(raw: str) -> str:
     k = norm(raw).lower()
@@ -125,6 +138,26 @@ def parse_prazo(raw) -> str:
         try: return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
         except ValueError: pass
     return s
+
+def parse_cod(raw) -> str:
+    """Normaliza o Cod_Task ('1.1.1', ' 6.3.2 ', '7,2,1' → '7.2.1')."""
+    s = norm(raw).replace(",", ".")
+    return s if re.fullmatch(r"[\d]+(\.[\d]+)*", s) else s
+
+def parse_deps(raw) -> list:
+    """Coluna 'Depende de' → lista de Cod_Task predecessores.
+    Aceita múltiplos códigos separados por ; / + ou espaço ('1.1.1; 2.3.1')."""
+    s = norm(raw)
+    if not s or s.lower() in ("-", "n/a", "não se aplica", "nao se aplica"):
+        return []
+    partes = re.split(r"[;,/+]|\s+e\s+|\s+", s)
+    deps, vistos = [], set()
+    for p in partes:
+        c = p.strip().strip(".,")
+        if c and re.fullmatch(r"[\d]+(\.[\d]+)*", c) and c not in vistos:
+            vistos.add(c)
+            deps.append(c)
+    return deps
 
 def eixo_id(text: str):
     m = re.match(r"^(\d+)\.", text.strip())
@@ -249,19 +282,23 @@ def read_file(path: Path):
         sys.exit(f"Formato não suportado: {suf}. Use .xlsx, .csv, .ods ou .odt")
 
 def setup_columns(header):
-    global COL_PRIORIDADE, COL_EIXO, COL_PROCESSO
-    global COL_ATIVIDADE, COL_TAREFA, COL_RESP, COL_PRAZO, COL_STATUS
+    global COL_PRIORIDADE, COL_EIXO, COL_PROCESSO, COL_ATIVIDADE
+    global COL_COD, COL_TAREFA, COL_DEPENDE, COL_RESP, COL_PRAZO, COL_STATUS
     cols = detect_columns(header)
     COL_PRIORIDADE = cols["prioridade"]
     COL_EIXO       = cols["eixo"]
     COL_PROCESSO   = cols["processo"]
     COL_ATIVIDADE  = cols["atividade"]
+    COL_COD        = cols["cod"]
     COL_TAREFA     = cols["tarefa"]
+    COL_DEPENDE    = cols["depende"]
     COL_RESP       = cols["resp"]
     COL_PRAZO      = cols["prazo"]
     COL_STATUS     = cols["status"]
     ncols = len(header)
     print(f"  Layout detectado: {ncols} colunas → Eixo na col {COL_EIXO}, Status na col {COL_STATUS}")
+    print(f"  Cod_Task: {'col ' + str(COL_COD) if COL_COD is not None else 'ausente'}"
+          f"  ·  Depende de: {'col ' + str(COL_DEPENDE) if COL_DEPENDE is not None else 'ausente'}")
 
 # ── parse + agrupamento ───────────────────────────────────────────────────────
 def parse_rows(raw_rows) -> list:
@@ -281,7 +318,9 @@ def parse_rows(raw_rows) -> list:
             "eixo":       cell(row, COL_EIXO),
             "processo":   cell(row, COL_PROCESSO),
             "atividade":  cell(row, COL_ATIVIDADE),
+            "cod":        parse_cod(cell(row, COL_COD)),
             "tarefa":     cell(row, COL_TAREFA),
+            "depende":    parse_deps(cell(row, COL_DEPENDE)),
             "resp":       cell(row, COL_RESP),
             "prazo":      cell(row, COL_PRAZO),
             "status":     cell(row, COL_STATUS),
@@ -333,6 +372,12 @@ def build_json(records: list) -> dict:
         if not desc:
             continue
 
+        # Quando a planilha tem Cod_Task, ele é a identidade da tarefa: linhas
+        # sem código E sem Tarefa são continuações de célula mesclada (ex.: só
+        # um prazo extra), não entregas — evita tarefas fantasma duplicadas.
+        if COL_COD is not None and not r["cod"] and not r["tarefa"]:
+            continue
+
         proc_key = r["processo"] or r["atividade"] or "Geral"
         if proc_key not in eixos[eid]["processos"]:
             eixos[eid]["processos"][proc_key] = []
@@ -344,6 +389,7 @@ def build_json(records: list) -> dict:
 
         eixos[eid]["processos"][proc_key].append({
             "id":         int(f"{eid}{counter:03d}"),
+            "cod":        r["cod"],
             "atividade":  r["atividade"],
             "desc":       desc,
             "resp":       r["resp"],
@@ -351,6 +397,7 @@ def build_json(records: list) -> dict:
             "prioridade": parse_prio(r["prioridade"]),
             "progresso":  progresso,
             "prazo":      parse_prazo(r["prazo"]),
+            "depende_de": r["depende"],
             "notas":      "",
         })
 
@@ -370,6 +417,78 @@ def build_json(records: list) -> dict:
             "processos": processos_out,
         })
     return linhas_out
+
+# ── validação do grafo de dependências ────────────────────────────────────────
+def validar_dependencias(linhas) -> dict:
+    """Confere o grafo Cod_Task → Depende de e devolve métricas.
+    Remove referências que não resolvem (código inexistente) para que o
+    front-end nunca desenhe uma aresta órfã."""
+    todas = [t for l in linhas for p in l["processos"] for t in p["tarefas"]]
+    por_cod: dict[str, list] = {}
+    for t in todas:
+        if t.get("cod"):
+            por_cod.setdefault(t["cod"], []).append(t)
+
+    for cod, ts in por_cod.items():
+        if len(ts) > 1:
+            print(f"  ⚠ Cod_Task duplicado na planilha: {cod} ({len(ts)}×)")
+
+    orfas, vinculos = [], 0
+    for t in todas:
+        validas = []
+        for d in t.get("depende_de", []):
+            if d == t.get("cod"):
+                print(f"  ⚠ {t['cod']} depende de si mesma — ignorado")
+            elif d in por_cod:
+                validas.append(d)
+                vinculos += 1
+            else:
+                orfas.append((t.get("cod") or t["desc"][:30], d))
+        t["depende_de"] = validas
+
+    for origem, alvo in orfas:
+        print(f"  ⚠ Dependência não encontrada: '{origem}' → '{alvo}' (código inexistente)")
+
+    # detecção de ciclos (DFS com marcação de cor)
+    sucessores: dict[str, list] = {}
+    for t in todas:
+        for d in t.get("depende_de", []):
+            sucessores.setdefault(d, []).append(t.get("cod"))
+
+    BRANCO, CINZA, PRETO = 0, 1, 2
+    cor = {c: BRANCO for c in por_cod}
+    ciclos = []
+
+    def visitar(c, caminho):
+        cor[c] = CINZA
+        for s in sucessores.get(c, []):
+            if s is None or s not in cor:
+                continue
+            if cor[s] == CINZA:
+                ciclos.append(" → ".join(caminho[caminho.index(s):] + [s]))
+            elif cor[s] == BRANCO:
+                visitar(s, caminho + [s])
+        cor[c] = PRETO
+
+    for c in list(cor):
+        if cor[c] == BRANCO:
+            visitar(c, [c])
+    for ciclo in ciclos:
+        print(f"  ⚠ Ciclo de dependência detectado: {ciclo}")
+
+    # bloqueadas por dependência: predecessor ainda não concluído
+    bloqueadas = 0
+    for t in todas:
+        deps = t.get("depende_de", [])
+        if not deps or t.get("status") == "concluido":
+            continue
+        if any(any(p.get("status") != "concluido" for p in por_cod[d]) for d in deps):
+            bloqueadas += 1
+
+    print(f"  Dependências: {vinculos} vínculos válidos, {bloqueadas} tarefas travadas, "
+          f"{len(orfas)} referências órfãs removidas, {len(ciclos)} ciclos")
+    return {"vinculos": vinculos, "bloqueadas": bloqueadas,
+            "orfas": len(orfas), "ciclos": len(ciclos)}
 
 # ── download SharePoint ───────────────────────────────────────────────────────
 def download_sharepoint(url, tenant, client_id, secret, dest: Path):
@@ -420,6 +539,7 @@ def main():
     setup_columns(header)
     records  = parse_rows(raw_rows)
     linhas   = build_json(records)
+    deps_info = validar_dependencias(linhas)
 
     total_tarefas = sum(len(p2["tarefas"]) for l in linhas for p2 in l["processos"])
     now = datetime.now(timezone.utc)
@@ -432,6 +552,7 @@ def main():
             "proxima_reuniao": args.proxima_reuniao,
             "guardia":         args.guardia,
             "schema":          "v2",
+            "dependencias":    deps_info,
         },
         "linhas": linhas,
     }
@@ -491,6 +612,14 @@ def append_snapshot(linhas, hist_path: Path):
             "status": status_eixo,
         })
 
+    # dependências: quantas tarefas estão travadas esperando um predecessor
+    por_cod = {t["cod"]: t for t in todas if t.get("cod")}
+    travadas = sum(
+        1 for t in todas
+        if t.get("status") != "concluido" and t.get("depende_de")
+        and any(por_cod.get(d, {}).get("status") != "concluido" for d in t["depende_de"])
+    )
+
     snapshot = {
         "date": today,
         "total_tarefas": total,
@@ -498,6 +627,7 @@ def append_snapshot(linhas, hist_path: Path):
         "progresso_medio": progresso_medio,
         "por_status": por_status,
         "por_eixo": por_eixo,
+        "travadas_por_dependencia": travadas,
     }
 
     historico["snapshots"].append(snapshot)

@@ -60,7 +60,7 @@ Substituir o header atual por versão institucional com 3 zonas:
       <div class="logos-left">
         <img src="assets/logo-unb.svg" alt="UnB" class="logo" height="44">
         <div class="logo-sep"></div>
-        <img src="assets/logo-mcid.svg" alt="MCid" class="logo" height="36">
+        <img src="assets/logo-mcid.svg" alt="MCID" class="logo" height="36">
       </div>
       <div class="hdr-top-right">
         <span class="badge"><span class="dot"></span><span id="hdrDate">–</span></span>
