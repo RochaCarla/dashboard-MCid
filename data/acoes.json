@@ -2,14 +2,14 @@
   "meta": {
     "titulo": "Painel de Gestão",
     "subtitulo": "Universidade de Brasília · Ministério das Cidades",
-    "atualizado_em": "2026-08-05",
-    "sincronizado_em": "2026-08-05T11:12:21Z",
+    "atualizado_em": "2026-08-06",
+    "sincronizado_em": "2026-08-06T11:12:46Z",
     "proxima_reuniao": "2026-06-18",
     "guardia": "Equipe CEAG",
     "schema": "v2",
     "dependencias": {
       "vinculos": 16,
-      "bloqueadas": 15,
+      "bloqueadas": 13,
       "orfas": 0,
       "ciclos": 0
     }
@@ -383,9 +383,9 @@
               "atividade": "Articular com Coordenação UnB",
               "desc": "Verificar agenda na próxima reunião de coordenação do TED",
               "resp": "SNH + UnB",
-              "status": "nao_iniciado",
+              "status": "concluido",
               "prioridade": "alta",
-              "progresso": 0,
+              "progresso": 100,
               "prazo": "",
               "depende_de": [],
               "notas": ""
@@ -396,9 +396,9 @@
               "atividade": "Fechamento do edital do mestrado profissional",
               "desc": "Fechamento do edital do mestrado profissional",
               "resp": "",
-              "status": "nao_iniciado",
+              "status": "concluido",
               "prioridade": "alta",
-              "progresso": 0,
+              "progresso": 100,
               "prazo": "2026-07-16",
               "depende_de": [],
               "notas": ""
@@ -464,9 +464,9 @@
               "atividade": "Dialogar com a CAIXA para verificar incentivos aos Municípios para aderirem ao normativo referencial",
               "desc": "Demandar estudo de impacto",
               "resp": "",
-              "status": "nao_iniciado",
+              "status": "concluido",
               "prioridade": "alta",
-              "progresso": 0,
+              "progresso": 100,
               "prazo": "3 meses",
               "depende_de": [],
               "notas": ""
@@ -606,9 +606,9 @@
               "atividade": "Identificar correlação com Construa Brasil",
               "desc": "Elaborar estratégia de disseminação do BIM",
               "resp": "SNH + MDIC + BDI",
-              "status": "nao_iniciado",
+              "status": "concluido",
               "prioridade": "media",
-              "progresso": 0,
+              "progresso": 100,
               "prazo": "2026-08-09",
               "depende_de": [],
               "notas": ""
