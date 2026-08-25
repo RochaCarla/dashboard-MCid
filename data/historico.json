@@ -9944,6 +9944,15 @@
         }
       ],
       "travadas_por_dependencia": 13
+    },
+    {
+      "date": "2026-08-25",
+      "total_tarefas": 0,
+      "total_eixos": 0,
+      "progresso_medio": 0,
+      "por_status": {},
+      "por_eixo": [],
+      "travadas_por_dependencia": 0
     }
   ]
 }
