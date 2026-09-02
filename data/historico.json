@@ -10322,6 +10322,15 @@
       "por_status": {},
       "por_eixo": [],
       "travadas_por_dependencia": 0
+    },
+    {
+      "date": "2026-09-02",
+      "total_tarefas": 0,
+      "total_eixos": 0,
+      "progresso_medio": 0,
+      "por_status": {},
+      "por_eixo": [],
+      "travadas_por_dependencia": 0
     }
   ]
 }
