@@ -32,12 +32,29 @@ from xml.etree import ElementTree as ET
 # ── dependências (openpyxl carregado sob demanda para .xlsx) ──────────────────
 openpyxl = None
 
+RX_EIXO = re.compile(r"^\s*\d+\s*\.\s*\S")
+
+def achar_col_eixo(data_rows, ocupadas):
+    """Acha a coluna do Eixo Temático pelo conteúdo ('1. Financiamento').
+    Usada quando o cabeçalho perdeu o rótulo. Devolve a coluna livre com mais
+    células no formato 'N. Nome'; None se nenhuma tiver."""
+    contagem = {}
+    for row in data_rows:
+        for i, cel in enumerate(row):
+            if i in ocupadas:
+                continue
+            if RX_EIXO.match(str(cel or "")):
+                contagem[i] = contagem.get(i, 0) + 1
+    if not contagem:
+        return None
+    return max(contagem, key=lambda i: (contagem[i], -i))
+
 # ── mapeamento de colunas  (índice 0-based) ───────────────────────────────────
 # Detecta colunas pelo NOME no cabeçalho (a planilha pode reordenar colunas).
 # Se o cabeçalho não tiver nomes reconhecíveis, cai no layout posicional legado:
 #   8 colunas: Prioridade | Prazo | Eixo | Processo | Atividade | Tarefa | Responsável | Status
 #   9 colunas: Prioridade | Prazo(ignorar) | Eixo | Processo | Atividade | Tarefa | Responsável | Prazo | Status
-def detect_columns(header_row):
+def detect_columns(header_row, data_rows=()):
     names = [norm(c).lower() for c in header_row]
 
     def find(*terms):
@@ -46,16 +63,33 @@ def detect_columns(header_row):
                 return i
         return None
 
+    nomeados = {
+        "prioridade": find("prioridade"),
+        "processo":   find("processo"),
+        "atividade":  find("atividade"),
+        "cod":        find("cod_task", "cod task", "código", "codigo", "cod"),
+        "tarefa":     find("tarefa"),
+        "depende":    find("depende", "dependência", "dependencia"),
+        "resp":       find("respons"),
+        "status":     find("status"),
+    }
+
     eixo = find("eixo", "linha")
+    # O cabeçalho do Eixo Temático já foi apagado na planilha (A1 em branco).
+    # Se as demais colunas têm nome, achar o eixo pelo CONTEÚDO é muito mais
+    # seguro do que cair no layout posicional — que mapeava o eixo para "Prazo"
+    # e descartava todas as linhas em silêncio.
+    if eixo is None and sum(v is not None for v in nomeados.values()) >= 4:
+        eixo = achar_col_eixo(data_rows, set(nomeados.values()))
+        if eixo is not None:
+            print(f"  ⚠ Cabeçalho do Eixo Temático ausente — detectado pelo "
+                  f"conteúdo na coluna {eixo}")
+
     if eixo is not None:
         # quando há duas colunas "Prazo" (legado), a última é o prazo da tarefa
         prazos = [i for i, n in enumerate(names) if "prazo" in n]
-        return {"prioridade": find("prioridade"), "eixo": eixo,
-                "processo": find("processo"), "atividade": find("atividade"),
-                "cod": find("cod_task", "cod task", "código", "codigo", "cod"),
-                "tarefa": find("tarefa"), "depende": find("depende", "dependência", "dependencia"),
-                "resp": find("respons"),
-                "prazo": prazos[-1] if prazos else None, "status": find("status")}
+        return {**nomeados, "eixo": eixo,
+                "prazo": prazos[-1] if prazos else None}
 
     ncols = len(header_row)
     if ncols <= 8:
@@ -281,10 +315,10 @@ def read_file(path: Path):
     else:
         sys.exit(f"Formato não suportado: {suf}. Use .xlsx, .csv, .ods ou .odt")
 
-def setup_columns(header):
+def setup_columns(header, data_rows=()):
     global COL_PRIORIDADE, COL_EIXO, COL_PROCESSO, COL_ATIVIDADE
     global COL_COD, COL_TAREFA, COL_DEPENDE, COL_RESP, COL_PRAZO, COL_STATUS
-    cols = detect_columns(header)
+    cols = detect_columns(header, data_rows)
     COL_PRIORIDADE = cols["prioridade"]
     COL_EIXO       = cols["eixo"]
     COL_PROCESSO   = cols["processo"]
@@ -536,12 +570,27 @@ def main():
 
     print(f"Lendo {path} …")
     header, raw_rows = read_file(path)
-    setup_columns(header)
+    setup_columns(header, raw_rows)
     records  = parse_rows(raw_rows)
     linhas   = build_json(records)
     deps_info = validar_dependencias(linhas)
 
     total_tarefas = sum(len(p2["tarefas"]) for l in linhas for p2 in l["processos"])
+
+    # Guarda: planilha com linhas mas nenhuma tarefa extraída significa que a
+    # detecção de colunas errou (foi o que aconteceu quando o cabeçalho do Eixo
+    # Temático foi apagado). Abortar preserva o último JSON bom no repositório
+    # em vez de publicar um painel vazio — e faz o workflow falhar à vista.
+    linhas_uteis = sum(1 for r in raw_rows if any(norm(c) for c in r))
+    if linhas_uteis and not total_tarefas:
+        sys.exit(
+            f"ERRO: {linhas_uteis} linhas lidas da planilha e 0 tarefas extraídas.\n"
+            f"       Provável mudança de cabeçalho/layout — o mapeamento de colunas "
+            f"não encontrou dados válidos.\n"
+            f"       Cabeçalho recebido: {[norm(c) for c in header]}\n"
+            f"       Nada foi gravado; o acoes.json anterior segue intacto."
+        )
+
     now = datetime.now(timezone.utc)
     data = {
         "meta": {
