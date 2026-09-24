@@ -2,8 +2,8 @@
   "meta": {
     "titulo": "Painel de Gestão",
     "subtitulo": "Universidade de Brasília · Ministério das Cidades",
-    "atualizado_em": "2026-09-23",
-    "sincronizado_em": "2026-09-23T13:59:33Z",
+    "atualizado_em": "2026-09-24",
+    "sincronizado_em": "2026-09-24T13:55:34Z",
     "proxima_reuniao": "2026-06-18",
     "guardia": "Equipe CEAG",
     "schema": "v2",
@@ -44,10 +44,10 @@
               "atividade": "Tratar os dados do questionário sobre a demanda por Capital de Giro",
               "desc": "Repassar ao BNDES as informações compiladas",
               "resp": "SNH",
-              "status": "nao_iniciado",
+              "status": "concluido",
               "prioridade": "media",
-              "progresso": 0,
-              "prazo": "2026-08-09",
+              "progresso": 100,
+              "prazo": "2026-10-28",
               "depende_de": [
                 "1.1.1"
               ],
